@@ -3,6 +3,8 @@ import { emailOTPClient, genericOAuthClient, organizationClient } from 'better-a
 import { createAuthClient } from 'better-auth/react'
 import { env, getEnv } from '@/lib/env'
 import { isDev, isProd } from '@/lib/environment'
+import { sessionBlocker } from './session-blocker'
+import { useState, useEffect } from 'react'
 
 export function getBaseURL() {
   let baseURL
@@ -46,7 +48,41 @@ export const client = createAuthClient({
   },
 })
 
-export const { useSession, useActiveOrganization } = client
+// Override useSession để sử dụng blocker
+export const useSession = () => {
+  const [session, setSession] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+
+    const loadSession = async () => {
+      try {
+        const sessionData = await sessionBlocker.getSession()
+        if (mounted) {
+          setSession(sessionData)
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.error('Session load error:', error)
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadSession()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  return { data: session, isLoading }
+}
+
+// Keep other exports
+export const { useActiveOrganization } = client
 
 export const useSubscription = () => {
   // In development, provide mock implementations
@@ -69,5 +105,3 @@ export const useSubscription = () => {
     restore: client.subscription?.restore,
   }
 }
-
-export const { signIn, signUp, signOut } = client
