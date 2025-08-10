@@ -39,7 +39,10 @@ export const client = createAuthClient({
     cookieName: 'better-auth.session_token',
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 60 * 1000,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   },
 })
 
