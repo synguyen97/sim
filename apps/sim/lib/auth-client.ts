@@ -34,20 +34,11 @@ export const client = createAuthClient({
         ]
       : []),
     organizationClient(),
-  ],
-  session: {
-    cookieName: 'better-auth.session_token',
-    expiresIn: 60 * 60 * 24 * 7,
-    updateAge: 60 * 60 * 24,
-    staleTime: 30 * 60 * 1000,
-    refetchInterval: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  },
+  ]
 })
 
 // Keep other exports
-export const { useActiveOrganization } = client
+export const { useActiveOrganization, useSession } = client
 
 export const useSubscription = () => {
   // In development, provide mock implementations
@@ -71,7 +62,7 @@ export const useSubscription = () => {
   }
 }
 
-export { useSession } from './useSession';
+// export { useSession } from './useSession';
 
 
 export const { signIn, signUp, signOut } = client
