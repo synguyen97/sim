@@ -35,6 +35,12 @@ export const client = createAuthClient({
       : []),
     organizationClient(),
   ],
+  session: {
+    cookieName: 'better-auth.session_token',
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+    staleTime: 5 * 60 * 1000,
+  },
 })
 
 export const { useSession, useActiveOrganization } = client
