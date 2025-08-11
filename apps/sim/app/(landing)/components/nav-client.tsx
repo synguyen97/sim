@@ -209,58 +209,33 @@ export default function NavClient({
   return (
     <nav className="absolute top-1 right-0 left-0 z-30 px-4 py-8">
       <div className="relative mx-auto flex max-w-7xl items-center justify-between">
-        {!isMobile && (
-          <div className="flex flex-1 items-center">
-            <div className="inline-block">
-              <Link href="/" className="inline-flex">
-                {brand.logoUrl ? (
-                  <img
-                    src={brand.logoUrl}
-                    alt={`${brand.name} Logo`}
-                    width={42}
-                    height={42}
-                    className="h-[42px] w-[42px] object-contain"
-                  />
-                ) : (
-                  <Image
-                    src="/nuggets-light-logo.png"
-                    alt={`${brand.name} Logo`}
-                    width={130}
-                    height={42}
-                  />
-                )}
-              </Link>
-            </div>
+        <div className="flex flex-1 items-center">
+          <div className="inline-block">
+            <Link href="/" className="inline-flex">
+              {brand.logoUrl ? (
+                <img
+                  src={brand.logoUrl}
+                  alt={`${brand.name} Logo`}
+                  width={42}
+                  height={42}
+                  className="h-[42px] w-[42px] object-contain"
+                />
+              ) : (
+                <Image
+                  src="/nuggets-light-logo.png"
+                  alt={`${brand.name} Logo`}
+                  width={130}
+                  height={42}
+                />
+              )}
+            </Link>
           </div>
-        )}
+        </div>
         {isMobile && <div className="flex-1" />}
 
         <div className="flex flex-1 items-center justify-end">
           <div className={`flex items-center ${isMobile ? "gap-2" : "gap-3"}`}>
             {!isMobile && <></>}
-
-            <div className="flex flex-1 items-center">
-              <div className="inline-block">
-                <Link href="/" className="inline-flex">
-                  {brand.logoUrl ? (
-                    <img
-                      src={brand.logoUrl}
-                      alt={`${brand.name} Logo`}
-                      width={42}
-                      height={42}
-                      className="h-[42px] w-[42px] object-contain"
-                    />
-                  ) : (
-                    <Image
-                      src="/nuggets-light-logo.png"
-                      alt={`${brand.name} Logo`}
-                      width={130}
-                      height={42}
-                    />
-                  )}
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </div>
