@@ -1007,7 +1007,6 @@ export function ControlBar({ hasValidationErrors = false }: ControlBarProps) {
       {renderDeleteButton()}
       {!isDebugging && renderDebugModeToggle()}
       {renderPublishButton()}
-      {renderDeployButton()}
       {isDebugging ? renderDebugControlsBar() : renderRunButton()}
 
       {/* Template Modal */}
