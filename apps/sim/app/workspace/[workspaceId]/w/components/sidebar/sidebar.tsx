@@ -1066,6 +1066,12 @@ interface KeyboardShortcutProps {
 }
 
 const KeyboardShortcut = ({ shortcut, className }: KeyboardShortcutProps) => {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const parts = shortcut.split('+')
 
   // Helper function to determine if a part is a symbol that should be larger
@@ -1082,7 +1088,11 @@ const KeyboardShortcut = ({ shortcut, className }: KeyboardShortcutProps) => {
     >
       <span className='flex items-center justify-center gap-[1px] pt-[1px]'>
         {parts.map((part, index) => (
-          <span key={index} className='text-[17px]'>
+          <span
+            key={index}
+            className={isClient ? 'text-[17px]' : 'text-xs'}
+            suppressHydrationWarning
+          >
             {part}
           </span>
         ))}
