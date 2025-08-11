@@ -129,11 +129,6 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
             <div className={cn('h-full', activeSection === 'apikeys' ? 'block' : 'hidden')}>
               <ApiKeys onOpenChange={onOpenChange} />
             </div>
-            {isSubscriptionEnabled && (
-              <div className={cn('h-full', activeSection === 'subscription' ? 'block' : 'hidden')}>
-                <Subscription onOpenChange={onOpenChange} />
-              </div>
-            )}
             <div className={cn('h-full', activeSection === 'team' ? 'block' : 'hidden')}>
               <TeamManagement />
             </div>

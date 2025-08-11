@@ -103,6 +103,10 @@ export function SettingsNavigation({
       return false
     }
 
+    if (item.id === 'subscription') {
+      return false
+    }
+
     // Hide team tab if user doesn't have team or enterprise subscription
     if (item.requiresTeam && !subscription.isTeam && !subscription.isEnterprise) {
       return false
