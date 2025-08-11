@@ -86,7 +86,7 @@ const getStatusDisplay = (doc: DocumentData) => {
           </>
         ),
         className:
-          'inline-flex items-center rounded-md bg-[#701FFC]/10 px-2 py-1 text-xs font-medium text-[#701FFC] dark:bg-[#701FFC]/20 dark:text-[#8B5FFF]',
+          'inline-flex items-center rounded-md bg-[#ff9100]/10 px-2 py-1 text-xs font-medium text-[#ff9100] dark:bg-[#ff9100]/20 dark:text-[#8B5FFF]',
       }
     case 'failed':
       return {
@@ -742,7 +742,7 @@ export function KnowledgeBase({
                             onCheckedChange={handleSelectAll}
                             disabled={!userPermissions.canEdit}
                             aria-label='Select all documents'
-                            className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[#701FFC]/20 data-[state=checked]:border-[#701FFC] data-[state=checked]:bg-[#701FFC] [&>*]:h-3 [&>*]:w-3'
+                            className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[#ff9100]/20 data-[state=checked]:border-[#ff9100] data-[state=checked]:bg-[#ff9100] [&>*]:h-3 [&>*]:w-3'
                           />
                         </th>
                         <th className='px-4 pt-2 pb-3 text-left font-medium'>
@@ -899,7 +899,7 @@ export function KnowledgeBase({
                                   disabled={!userPermissions.canEdit}
                                   onClick={(e) => e.stopPropagation()}
                                   aria-label={`Select ${doc.filename}`}
-                                  className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[#701FFC]/20 data-[state=checked]:border-[#701FFC] data-[state=checked]:bg-[#701FFC] [&>*]:h-3 [&>*]:w-3'
+                                  className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[#ff9100]/20 data-[state=checked]:border-[#ff9100] data-[state=checked]:bg-[#ff9100] [&>*]:h-3 [&>*]:w-3'
                                 />
                               </td>
 

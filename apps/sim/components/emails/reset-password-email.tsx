@@ -24,7 +24,7 @@ interface ResetPasswordEmailProps {
   updatedDate?: Date
 }
 
-const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://sim.ai'
+const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://app.buildnuggets.ai'
 
 export const ResetPasswordEmail = ({
   username = '',

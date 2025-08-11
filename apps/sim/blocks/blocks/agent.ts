@@ -65,7 +65,7 @@ export const AgentBlock: BlockConfig<AgentResponse> = {
     'Create powerful AI agents using any LLM provider with customizable system prompts and tool integrations.',
   docsLink: 'https://docs.sim.ai/blocks/agent',
   category: 'blocks',
-  bgColor: '#802FFF',
+  bgColor: '#c56200',
   icon: AgentIcon,
   subBlocks: [
     {

@@ -188,7 +188,7 @@ export default function ContributorsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                Meet the amazing people who have helped build and improve Sim
+                Meet the amazing people who have helped build and improve Nuggets
               </motion.p>
             </div>
 
@@ -239,7 +239,7 @@ export default function ContributorsPage() {
               <div className='mb-6 grid grid-cols-1 gap-3 sm:mb-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-5'>
                 <div className='rounded-lg border border-[#606060]/20 bg-neutral-800/30 p-3 text-center sm:rounded-xl sm:p-4'>
                   <div className='mb-1 flex items-center justify-center sm:mb-2'>
-                    <Star className='h-4 w-4 text-[#701ffc] sm:h-5 sm:w-5' />
+                    <Star className='h-4 w-4 text-[#ff9100] sm:h-5 sm:w-5' />
                   </div>
                   <div className='font-bold text-lg text-white sm:text-xl'>{repoStats.stars}</div>
                   <div className='text-neutral-400 text-xs'>Stars</div>
@@ -247,7 +247,7 @@ export default function ContributorsPage() {
 
                 <div className='rounded-lg border border-[#606060]/20 bg-neutral-800/30 p-3 text-center sm:rounded-xl sm:p-4'>
                   <div className='mb-1 flex items-center justify-center sm:mb-2'>
-                    <GitFork className='h-4 w-4 text-[#701ffc] sm:h-5 sm:w-5' />
+                    <GitFork className='h-4 w-4 text-[#ff9100] sm:h-5 sm:w-5' />
                   </div>
                   <div className='font-bold text-lg text-white sm:text-xl'>{repoStats.forks}</div>
                   <div className='text-neutral-400 text-xs'>Forks</div>
@@ -255,7 +255,7 @@ export default function ContributorsPage() {
 
                 <div className='rounded-lg border border-[#606060]/20 bg-neutral-800/30 p-3 text-center sm:rounded-xl sm:p-4'>
                   <div className='mb-1 flex items-center justify-center sm:mb-2'>
-                    <GitGraph className='h-4 w-4 text-[#701ffc] sm:h-5 sm:w-5' />
+                    <GitGraph className='h-4 w-4 text-[#ff9100] sm:h-5 sm:w-5' />
                   </div>
                   <div className='font-bold text-lg text-white sm:text-xl'>
                     {filteredContributors?.length || 0}
@@ -265,7 +265,7 @@ export default function ContributorsPage() {
 
                 <div className='rounded-lg border border-[#606060]/20 bg-neutral-800/30 p-3 text-center sm:rounded-xl sm:p-4'>
                   <div className='mb-1 flex items-center justify-center sm:mb-2'>
-                    <MessageCircle className='h-4 w-4 text-[#701ffc] sm:h-5 sm:w-5' />
+                    <MessageCircle className='h-4 w-4 text-[#ff9100] sm:h-5 sm:w-5' />
                   </div>
                   <div className='font-bold text-lg text-white sm:text-xl'>
                     {repoStats.openIssues}
@@ -275,7 +275,7 @@ export default function ContributorsPage() {
 
                 <div className='rounded-lg border border-[#606060]/20 bg-neutral-800/30 p-3 text-center sm:rounded-xl sm:p-4'>
                   <div className='mb-1 flex items-center justify-center sm:mb-2'>
-                    <GitPullRequest className='h-4 w-4 text-[#701ffc] sm:h-5 sm:w-5' />
+                    <GitPullRequest className='h-4 w-4 text-[#ff9100] sm:h-5 sm:w-5' />
                   </div>
                   <div className='font-bold text-lg text-white sm:text-xl'>{repoStats.openPRs}</div>
                   <div className='text-neutral-400 text-xs'>Pull Requests</div>
@@ -291,8 +291,8 @@ export default function ContributorsPage() {
                   <AreaChart data={timelineData} className='-mx-2 sm:-mx-5 mt-1 sm:mt-2'>
                     <defs>
                       <linearGradient id='commits' x1='0' y1='0' x2='0' y2='1'>
-                        <stop offset='5%' stopColor='#701ffc' stopOpacity={0.3} />
-                        <stop offset='95%' stopColor='#701ffc' stopOpacity={0} />
+                        <stop offset='5%' stopColor='#ff9100' stopOpacity={0.3} />
+                        <stop offset='95%' stopColor='#ff9100' stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis
@@ -320,7 +320,7 @@ export default function ContributorsPage() {
                             <div className='rounded-lg border border-[#606060]/30 bg-[#0f0f0f] p-2 shadow-lg backdrop-blur-sm sm:p-3'>
                               <div className='grid gap-1 sm:gap-2'>
                                 <div className='flex items-center gap-1 sm:gap-2'>
-                                  <GitGraph className='h-3 w-3 text-[#701ffc] sm:h-4 sm:w-4' />
+                                  <GitGraph className='h-3 w-3 text-[#ff9100] sm:h-4 sm:w-4' />
                                   <span className='text-neutral-400 text-xs sm:text-sm'>
                                     Commits:
                                   </span>
@@ -338,7 +338,7 @@ export default function ContributorsPage() {
                     <Area
                       type='monotone'
                       dataKey='commits'
-                      stroke='#701ffc'
+                      stroke='#ff9100'
                       strokeWidth={2}
                       fill='url(#commits)'
                     />
@@ -393,7 +393,7 @@ export default function ContributorsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
-                        <Avatar className='h-12 w-12 ring-2 ring-[#606060]/30 transition-transform group-hover:scale-105 group-hover:ring-[#701ffc]/60 sm:h-16 sm:w-16'>
+                        <Avatar className='h-12 w-12 ring-2 ring-[#606060]/30 transition-transform group-hover:scale-105 group-hover:ring-[#ff9100]/60 sm:h-16 sm:w-16'>
                           <AvatarImage
                             src={contributor.avatar_url}
                             alt={contributor.login}
@@ -405,13 +405,13 @@ export default function ContributorsPage() {
                         </Avatar>
 
                         <div className='mt-2 text-center sm:mt-3'>
-                          <span className='block font-medium text-white text-xs transition-colors group-hover:text-[#701ffc] sm:text-sm'>
+                          <span className='block font-medium text-white text-xs transition-colors group-hover:text-[#ff9100] sm:text-sm'>
                             {contributor.login.length > 12
                               ? `${contributor.login.slice(0, 12)}...`
                               : contributor.login}
                           </span>
                           <div className='mt-1 flex items-center justify-center gap-1 sm:mt-2'>
-                            <GitGraph className='h-2 w-2 text-neutral-400 transition-colors group-hover:text-[#701ffc] sm:h-3 sm:w-3' />
+                            <GitGraph className='h-2 w-2 text-neutral-400 transition-colors group-hover:text-[#ff9100] sm:h-3 sm:w-3' />
                             <span className='font-medium text-neutral-300 text-xs transition-colors group-hover:text-white sm:text-sm'>
                               {contributor.contributions}
                             </span>
@@ -508,7 +508,7 @@ export default function ContributorsPage() {
                         />
                         <Bar
                           dataKey='contributions'
-                          className='fill-[#701ffc]'
+                          className='fill-[#ff9100]'
                           radius={[4, 4, 0, 0]}
                         />
                       </BarChart>
@@ -532,7 +532,7 @@ export default function ContributorsPage() {
             >
               <div className='relative p-6 sm:p-8 md:p-12 lg:p-16'>
                 <div className='text-center'>
-                  <div className='mb-4 inline-flex items-center rounded-full border border-[#701ffc]/20 bg-[#701ffc]/10 px-3 py-1 font-medium text-[#701ffc] text-xs sm:mb-6 sm:px-4 sm:py-2 sm:text-sm'>
+                  <div className='mb-4 inline-flex items-center rounded-full border border-[#ff9100]/20 bg-[#ff9100]/10 px-3 py-1 font-medium text-[#ff9100] text-xs sm:mb-6 sm:px-4 sm:py-2 sm:text-sm'>
                     <Github className='mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4' />
                     Apache-2.0 Licensed
                   </div>
@@ -550,7 +550,7 @@ export default function ContributorsPage() {
                     <Button
                       asChild
                       size='lg'
-                      className='bg-[#701ffc] text-white transition-colors duration-500 hover:bg-[#802FFF]'
+                      className='bg-[#ff9100] text-white transition-colors duration-500 hover:bg-[#c56200]'
                     >
                       <a
                         href='https://github.com/simstudioai/sim/blob/main/.github/CONTRIBUTING.md'

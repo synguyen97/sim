@@ -166,7 +166,7 @@ function UnsubscribeContent() {
                     '_blank'
                   )
                 }
-                className='w-full bg-[#701ffc] font-medium text-white shadow-sm transition-colors duration-200 hover:bg-[#802FFF]'
+                className='w-full bg-[#ff9100] font-medium text-white shadow-sm transition-colors duration-200 hover:bg-[#c56200]'
               >
                 Contact Support
               </Button>
@@ -276,7 +276,7 @@ function UnsubscribeContent() {
           <CardTitle className='text-foreground'>We&apos;re sorry to see you go!</CardTitle>
           <CardDescription className='text-muted-foreground'>
             We understand email preferences are personal. Choose which emails you&apos;d like to
-            stop receiving from Sim.
+            stop receiving from Nuggets.
           </CardDescription>
           <div className='mt-2 rounded-lg border bg-muted/50 p-3'>
             <p className='text-muted-foreground text-xs'>

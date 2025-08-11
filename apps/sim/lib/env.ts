@@ -188,7 +188,7 @@ export const env = createEnv({
     NEXT_PUBLIC_GOOGLE_PROJECT_NUMBER:    z.string().optional(),                // Google project number for Drive picker
 
     // UI Branding & Whitelabeling
-    NEXT_PUBLIC_BRAND_NAME:               z.string().optional(),                // Custom brand name (defaults to "Sim")
+    NEXT_PUBLIC_BRAND_NAME:               z.string().optional(),                // Custom brand name (defaults to "Nuggets")
     NEXT_PUBLIC_BRAND_LOGO_URL:           z.string().url().optional(),          // Custom logo URL
     NEXT_PUBLIC_BRAND_FAVICON_URL:        z.string().url().optional(),          // Custom favicon URL
     NEXT_PUBLIC_BRAND_PRIMARY_COLOR:      z.string().optional(),                // Primary brand color (hex)

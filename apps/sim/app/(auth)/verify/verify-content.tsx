@@ -124,7 +124,7 @@ function VerificationForm({
 
             <Button
               onClick={verifyCode}
-              className='h-11 w-full bg-[#701ffc] font-medium text-base text-white shadow-[#701ffc]/20 shadow-lg transition-colors duration-200 hover:bg-[#802FFF]'
+              className='h-11 w-full bg-[#ff9100] font-medium text-base text-white shadow-[#ff9100]/20 shadow-lg transition-colors duration-200 hover:bg-[#c56200]'
               disabled={!isOtpComplete || isLoading}
             >
               {isLoading ? 'Verifying...' : 'Verify Email'}
@@ -140,7 +140,7 @@ function VerificationForm({
                     </span>
                   ) : (
                     <button
-                      className='font-medium text-[#9D54FF] underline-offset-4 transition hover:text-[#a66fff] hover:underline'
+                      className='font-medium text-[#ff9100] underline-offset-4 transition hover:text-[#ffd180] hover:underline'
                       onClick={handleResend}
                       disabled={isLoading || isResendDisabled}
                     >

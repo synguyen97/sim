@@ -25,7 +25,7 @@ interface DiscordConfigProps {
 
 const examplePayload = JSON.stringify(
   {
-    content: 'Hello from Sim!',
+    content: 'Hello from Nuggets!',
     username: 'Optional Custom Name',
     avatar_url: 'https://example.com/avatar.png',
   },
@@ -56,7 +56,7 @@ export function DiscordConfig({
             id='discord-webhook-name'
             value={webhookName}
             onChange={(e) => setWebhookName(e.target.value)}
-            placeholder='Sim Bot'
+            placeholder='Nuggets Bot'
             disabled={isLoadingToken}
           />
         </ConfigField>
@@ -102,7 +102,7 @@ export function DiscordConfig({
 
       <InstructionsSection title='Sending Messages to Discord (Outgoing via this URL)'>
         <p>
-          To send messages <i>to</i> Discord using the Sim Webhook URL (above), make a POST request
+          To send messages <i>to</i> Discord using the Nuggets Webhook URL (above), make a POST request
           with a JSON body like this:
         </p>
         <CodeBlock language='json' code={examplePayload} className='mt-2 text-sm' />
@@ -116,7 +116,7 @@ export function DiscordConfig({
         <Terminal className='h-4 w-4' />
         <AlertTitle>Security Note</AlertTitle>
         <AlertDescription>
-          The Sim Webhook URL allows sending messages <i>to</i> Discord. Treat it like a password.
+          The Nuggets Webhook URL allows sending messages <i>to</i> Discord. Treat it like a password.
           Don't share it publicly.
         </AlertDescription>
       </Alert>

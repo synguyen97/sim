@@ -21,16 +21,16 @@ export interface BrandConfig {
  * Default brand configuration values
  */
 const defaultConfig: BrandConfig = {
-  name: 'Sim',
+  name: 'Nuggets',
   logoUrl: undefined,
   faviconUrl: '/favicon/favicon.ico',
   primaryColor: '#000000',
-  secondaryColor: '#6366f1',
-  accentColor: '#f59e0b',
+  secondaryColor: '#ff9100',
+  accentColor: '#ffd180',
   customCssUrl: undefined,
   hideBranding: false,
   footerText: undefined,
-  supportEmail: 'help@sim.ai',
+  supportEmail: 'info@buildnuggets.ai',
   supportUrl: undefined,
   documentationUrl: undefined,
   termsUrl: undefined,

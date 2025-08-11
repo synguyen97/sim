@@ -76,18 +76,18 @@ export function getEmailSubject(
 ): string {
   switch (type) {
     case 'sign-in':
-      return 'Sign in to Sim'
+      return 'Sign in to Nuggets'
     case 'email-verification':
-      return 'Verify your email for Sim'
+      return 'Verify your email for Nuggets'
     case 'forget-password':
-      return 'Reset your Sim password'
+      return 'Reset your Nuggets password'
     case 'reset-password':
-      return 'Reset your Sim password'
+      return 'Reset your Nuggets password'
     case 'invitation':
-      return "You've been invited to join a team on Sim"
+      return "You've been invited to join a team on Nuggets"
     case 'batch-invitation':
-      return "You've been invited to join a team and workspaces on Sim"
+      return "You've been invited to join a team and workspaces on Nuggets"
     default:
-      return 'Sim'
+      return 'Nuggets'
   }
 }

@@ -14,7 +14,7 @@ interface EmailFooterProps {
 }
 
 export const EmailFooter = ({
-  baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://sim.ai',
+  baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://app.buildnuggets.ai',
   unsubscribe,
 }: EmailFooterProps) => {
   const brand = getBrandConfig()
