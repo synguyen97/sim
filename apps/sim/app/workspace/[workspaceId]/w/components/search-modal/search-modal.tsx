@@ -921,10 +921,7 @@ const KeyboardShortcut = ({ shortcut, className }: KeyboardShortcutProps) => {
         {parts.map((part, index) => (
           <span
             key={index}
-            className={cn(
-              isSymbol(part) ? 'text-[17px]' : 'text-xs',
-              isShiftSymbol(part) && 'pb-[4px]'
-            )}
+            className='text-[17px] pb-[4px]'
           >
             {part}
           </span>

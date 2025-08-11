@@ -1082,7 +1082,7 @@ const KeyboardShortcut = ({ shortcut, className }: KeyboardShortcutProps) => {
     >
       <span className='flex items-center justify-center gap-[1px] pt-[1px]'>
         {parts.map((part, index) => (
-          <span key={index} className={cn(isSymbol(part) ? 'text-[17px]' : 'text-xs')}>
+          <span key={index} className='text-[17px]'>
             {part}
           </span>
         ))}
