@@ -62,7 +62,6 @@ export function LongInput({
         },
         onStreamChunk: (chunk) => {
           // Update local content with each chunk as it arrives
-          console.log('Wand stream chunk:', chunk)
           setLocalContent((current) => current + chunk)
         },
         onGeneratedContent: (content) => {
@@ -111,7 +110,7 @@ export function LongInput({
   // Update store value during streaming (but won't persist until streaming ends)
   useEffect(() => {
     console.log("Wand streaming content:", wandHook?.isStreaming, localContent, isPreview, disabled)
-    if (wandHook?.isStreaming && localContent !== '') {
+    if (localContent !== '') {
       if (!isPreview && !disabled) {
         console.log('Wand streaming content:', localContent)
         setStoreValue(localContent)
