@@ -112,6 +112,7 @@ export function LongInput({
   useEffect(() => {
     if (wandHook?.isStreaming && localContent !== '') {
       if (!isPreview && !disabled) {
+        console.log('Wand streaming content:', localContent)
         setStoreValue(localContent)
       }
     }
