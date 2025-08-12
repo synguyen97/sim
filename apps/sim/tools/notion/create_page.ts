@@ -73,7 +73,7 @@ export const notionCreatePageTool: ToolConfig<NotionCreatePageParams, NotionResp
       const body: any = {
         parent: {
           type: 'page_id',
-          page_id: formattedParentId,
+          page_id: params.parentId,
         },
       }
 
@@ -115,7 +115,7 @@ export const notionCreatePageTool: ToolConfig<NotionCreatePageParams, NotionResp
           },
         ]
       }
-
+      console.log('Notion create page request body:', body)
       return body
     },
   },
