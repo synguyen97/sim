@@ -52,7 +52,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Qdrant',
     'Reddit',
     'S3',
-    'SharePoint',
+    'Sharepoint',
     'Stagehand Agent',
     'Stagehand Extract',
     'Supabase',
@@ -141,13 +141,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
       triggers: triggerBlockItems,
     }
   }, [searchQuery])
-
-  console.log('Toolbar blocks:', {
-    regularBlocks,
-    specialBlocks,
-    tools,
-    triggers,
-  });
   
   return (
     <div className='flex h-full flex-col'>
