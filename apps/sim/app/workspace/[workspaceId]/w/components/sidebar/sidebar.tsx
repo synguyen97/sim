@@ -1082,15 +1082,15 @@ const KeyboardShortcut = ({ shortcut, className }: KeyboardShortcutProps) => {
   return (
     <kbd
       className={cn(
-        'flex h-6 w-8 items-center justify-center rounded-[5px] border border-border bg-background font-mono text-[#CDCDCD] text-xs dark:text-[#454545]',
+        'flex h-6 w-12 items-center justify-center rounded-[5px] border border-border bg-background font-mono text-[#CDCDCD] text-xs dark:text-[#454545]',
         className
       )}
     >
-      <span className='flex items-center justify-center gap-[1px] pt-[1px]'>
+      <span className='flex items-center justify-center gap-[2px] pt-[1px]'>
         {parts.map((part, index) => (
           <span
             key={index}
-            className={isClient ? 'text-[17px]' : 'text-xs'}
+            className={isClient ? 'text-[xs]' : 'text-xs'}
             suppressHydrationWarning
           >
             {part}
