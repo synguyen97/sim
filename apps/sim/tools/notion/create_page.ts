@@ -157,6 +157,7 @@ export const notionCreatePageTool: ToolConfig<NotionCreatePageParams, NotionResp
   },
 
   transformError: (error) => {
+    console.log('Error creating Notion page:', error)
     return error instanceof Error ? error.message : 'Failed to create Notion page'
   },
 }
