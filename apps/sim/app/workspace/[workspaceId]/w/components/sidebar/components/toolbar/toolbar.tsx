@@ -36,7 +36,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Hugging Face',
     'Hunter io',
     'Jina',
-    'Jira',
     'Exa',
     'Airtable',
     'Linear',
