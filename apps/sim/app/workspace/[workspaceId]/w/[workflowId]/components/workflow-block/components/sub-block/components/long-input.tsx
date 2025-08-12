@@ -62,6 +62,7 @@ export function LongInput({
         },
         onStreamChunk: (chunk) => {
           // Update local content with each chunk as it arrives
+          console.log('Wand stream chunk:', chunk)
           setLocalContent((current) => current + chunk)
         },
         onGeneratedContent: (content) => {
