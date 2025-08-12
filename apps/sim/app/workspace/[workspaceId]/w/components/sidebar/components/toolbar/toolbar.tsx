@@ -25,12 +25,55 @@ interface BlockItem {
 export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }: ToolbarProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
+  const hiddenBlockNames = [
+    'ArXiv',
+    'Clay', 
+    'Confluence',
+    'Discord',
+    'ElevenLabs',
+    'Firecrawl',
+    'GitHub',
+    'Hugging Face',
+    'Hunter io',
+    'Jina',
+    'Jira',
+    'Linear',
+    'Linkup',
+    'Mem0',
+    'Microsoft Excel',
+    'Microsoft Planner', 
+    'Microsoft Teams',
+    'Mistral Parser',
+    'OneDrive',
+    'Outlook',
+    'Pinecone',
+    'Qdrant',
+    'Reddit',
+    'S3',
+    'SharePoint',
+    'Stagehand Agent',
+    'Stagehand Extract',
+    'Supabase',
+    'Tavily',
+    'Telegram',
+    'Twilio SMS',
+    'Typeform',
+    'Vision',
+    'Wealthbox',
+    'WhatsApp',
+    'Wikipedia',
+    'X',
+    'YouTube'
+  ]
+
   const { regularBlocks, specialBlocks, tools, triggers } = useMemo(() => {
     const allBlocks = getAllBlocks()
 
-    // Filter blocks based on search query
+    // Filter blocks based on search query AND hidden block names
     const filteredBlocks = allBlocks.filter((block) => {
       if (block.type === 'starter' || block.hideFromToolbar) return false
+      
+      if (hiddenBlockNames.includes(block.name)) return false
 
       return (
         !searchQuery.trim() ||
@@ -97,6 +140,13 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     }
   }, [searchQuery])
 
+  console.log('Toolbar blocks:', {
+    regularBlocks,
+    specialBlocks,
+    tools,
+    triggers,
+  });
+  
   return (
     <div className='flex h-full flex-col'>
       {/* Search */}
