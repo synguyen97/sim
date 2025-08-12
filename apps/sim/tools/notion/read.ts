@@ -104,7 +104,7 @@ export const notionReadTool: ToolConfig<NotionReadParams, NotionResponse> = {
 
     // Fetch page content using blocks endpoint
     const blocksResponse = await fetch(
-      `https://api.notion.com/v1/blocks/${formattedId}/children?page_size=100`,
+      `https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`,
       {
         method: 'GET',
         headers: {
