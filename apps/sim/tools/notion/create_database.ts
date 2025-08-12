@@ -94,7 +94,7 @@ export const notionCreateDatabaseTool: ToolConfig<NotionCreateDatabaseParams, No
       const body = {
         parent: {
           type: 'page_id',
-          page_id: formattedParentId,
+          page_id: params.parentId,
         },
         title: [
           {

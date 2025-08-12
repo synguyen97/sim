@@ -42,7 +42,7 @@ export const notionReadTool: ToolConfig<NotionReadParams, NotionResponse> = {
       const formattedId = params.pageId.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')
 
       // Use the page endpoint to get page properties
-      return `https://api.notion.com/v1/pages/${formattedId}`
+      return `https://api.notion.com/v1/pages/${params.pageId}`
     },
     method: 'GET',
     headers: (params: NotionReadParams) => {

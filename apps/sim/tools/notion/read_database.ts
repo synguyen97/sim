@@ -49,7 +49,7 @@ export const notionReadDatabaseTool: ToolConfig<NotionReadDatabaseParams, Notion
         '$1-$2-$3-$4-$5'
       )
 
-      return `https://api.notion.com/v1/databases/${formattedId}`
+      return `https://api.notion.com/v1/databases/${params.databaseId}`
     },
     method: 'GET',
     headers: (params: NotionReadDatabaseParams) => {
