@@ -146,7 +146,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
         <div className='flex h-9 items-center gap-2 rounded-[8px] border bg-background pr-2 pl-3'>
           <Search className='h-4 w-4 text-muted-foreground' strokeWidth={2} />
           <Input
-            placeholder='Search blocks...'
+            placeholder='Search nuggets...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className='h-6 flex-1 border-0 bg-transparent px-0 text-muted-foreground text-sm leading-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0'
