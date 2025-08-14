@@ -71,7 +71,7 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
       isAborting = false,
       placeholder = 'How can I help you today?',
       className,
-      mode = 'ask',
+      mode = 'agent',
       onModeChange,
       value: controlledValue,
       onChange: onControlledChange,
@@ -498,9 +498,8 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
             <Button
               variant='ghost'
               size='sm'
-              // onClick={handleModeToggle}
-              // disabled={!onModeChange}
-              disabled
+              onClick={handleModeToggle}
+              disabled={!onModeChange}
               className='flex h-6 items-center gap-1.5 rounded-full bg-secondary px-2 py-1 font-medium text-secondary-foreground text-xs hover:bg-secondary/80'
             >
               {getModeIcon()}
