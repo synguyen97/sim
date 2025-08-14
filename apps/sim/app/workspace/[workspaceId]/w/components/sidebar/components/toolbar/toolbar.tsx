@@ -36,7 +36,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Jina',
     'Exa',
     'Airtable',
-    'Linear',
     'Linkup',
     'Mem0',
     'Microsoft Excel',
@@ -60,7 +59,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Vision',
     'Wealthbox',
     'WhatsApp',
-    'Wikipedia',
     'X',
     'YouTube'
   ]
