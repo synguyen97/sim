@@ -27,11 +27,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
 
   const hiddenBlockNames = [
     'Confluence',
-    'Jina',
-    'Exa',
-    'Airtable',
-    'Linkup',
-    'Mem0',
     'Microsoft Excel',
     'Microsoft Planner', 
     'Microsoft Teams',
@@ -39,7 +34,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'OneDrive',
     'Outlook',
     'Pinecone',
-    'Qdrant',
     'S3',
     'Sharepoint',
     'Stagehand Agent',
