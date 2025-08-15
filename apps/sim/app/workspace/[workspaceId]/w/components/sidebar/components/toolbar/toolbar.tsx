@@ -26,11 +26,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
   const [searchQuery, setSearchQuery] = useState('')
 
   const hiddenBlockNames = [
-    'ArXiv',
-    'Clay', 
     'Confluence',
-    'Firecrawl',
-    'Hunter io',
     'Jina',
     'Exa',
     'Airtable',
@@ -55,7 +51,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Vision',
     'Wealthbox',
     'WhatsApp',
-    'X',
     'YouTube'
   ]
 
