@@ -40,12 +40,8 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Stagehand Extract',
     'Supabase',
     'Tavily',
-    'Twilio SMS',
-    'Typeform',
     'Vision',
     'Wealthbox',
-    'WhatsApp',
-    'YouTube'
   ]
 
   const { regularBlocks, specialBlocks, tools, triggers } = useMemo(() => {
