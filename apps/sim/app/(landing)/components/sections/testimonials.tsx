@@ -71,6 +71,13 @@ const X_TESTIMONIALS = [
   },
 ]
 
+const replaceSimWithNuggets = (text: string): string => {
+  return text
+    .replace(/\bSim\b/g, 'Nuggets')
+    .replace(/\bsim\b/g, 'nuggets')
+    .replace(/@simstudioai/g, '@nuggetstudioai')
+}
+
 // Split the testimonials into two rows
 const firstRowTestimonials = X_TESTIMONIALS.slice(0, Math.ceil(X_TESTIMONIALS.length / 2))
 const secondRowTestimonials = X_TESTIMONIALS.slice(Math.ceil(X_TESTIMONIALS.length / 2))
@@ -114,12 +121,11 @@ function Testimonials() {
                 className='mx-0.5 flex min-w-[280px] max-w-[340px] cursor-pointer flex-col gap-2 rounded-lg border border-[#333] bg-[#121212] p-2 sm:min-w-[320px] sm:max-w-[380px] sm:p-3'
                 whileHover={{ scale: 1.02, boxShadow: '0 8px 32px 0 rgba(80, 60, 120, 0.18)' }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                onClick={() =>
-                  card.tweetUrl && window.open(card.tweetUrl, '_blank', 'noopener,noreferrer')
-                }
               >
                 <div className='flex flex-col gap-1'>
-                  <p className='font-medium text-sm text-white sm:text-base'>{card.text}</p>
+                  <p className='font-medium text-sm text-white sm:text-base'>
+                    {replaceSimWithNuggets(card.text)}
+                  </p>
                 </div>
                 <div className='mt-auto flex items-center justify-between'>
                   <div className='flex items-center gap-1.5 sm:gap-2'>
@@ -155,12 +161,9 @@ function Testimonials() {
                 className='mx-0.5 flex min-w-[280px] max-w-[340px] cursor-pointer flex-col gap-2 rounded-lg border border-[#333] bg-[#121212] p-2 sm:min-w-[320px] sm:max-w-[380px] sm:p-3'
                 whileHover={{ scale: 1.02, boxShadow: '0 8px 32px 0 rgba(80, 60, 120, 0.18)' }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                onClick={() =>
-                  card.tweetUrl && window.open(card.tweetUrl, '_blank', 'noopener,noreferrer')
-                }
               >
                 <div className='flex flex-col gap-1'>
-                  <p className='font-medium text-sm text-white sm:text-base'>{card.text}</p>
+                  <p className='font-medium text-sm text-white sm:text-base'>{replaceSimWithNuggets(card.text)}</p>
                 </div>
                 <div className='mt-auto flex items-center justify-between'>
                   <div className='flex items-center gap-1.5 sm:gap-2'>

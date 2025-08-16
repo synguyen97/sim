@@ -764,7 +764,7 @@ export function WorkflowBlock({ id, data }: NodeProps<WorkflowBlockProps>) {
                     }}
                     className={cn(
                       'h-7 p-1 text-gray-500',
-                      blockAdvancedMode && 'text-[var(--brand-primary-hex)]',
+                      blockAdvancedMode && 'text-[#ff9100]',
                       !userPermissions.canEdit && 'cursor-not-allowed opacity-50'
                     )}
                     disabled={!userPermissions.canEdit}
@@ -817,74 +817,55 @@ export function WorkflowBlock({ id, data }: NodeProps<WorkflowBlockProps>) {
                 </TooltipContent>
               </Tooltip>
             )}
-            {config.docsLink ? (
+            {config.longDescription && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    className='h-7 p-1 text-gray-500'
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      window.open(config.docsLink, '_target', 'noopener,noreferrer')
-                    }}
-                  >
-                    <BookOpen className='h-5 w-5' />
+                  <Button variant='ghost' size='sm' className='h-7 p-1 text-gray-500'>
+                    <Info className='h-5 w-5' />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side='top'>See Docs</TooltipContent>
-              </Tooltip>
-            ) : (
-              config.longDescription && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant='ghost' size='sm' className='h-7 p-1 text-gray-500'>
-                      <Info className='h-5 w-5' />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side='top' className='max-w-[300px] p-4'>
-                    <div className='space-y-3'>
-                      <div>
-                        <p className='mb-1 font-medium text-sm'>Description</p>
-                        <p className='text-muted-foreground text-sm'>{config.longDescription}</p>
-                      </div>
-                      {config.outputs && (
-                        <div>
-                          <p className='mb-1 font-medium text-sm'>Output</p>
-                          <div className='text-sm'>
-                            {Object.entries(config.outputs).map(([key, value]) => (
-                              <div key={key} className='mb-1'>
-                                <span className='text-muted-foreground'>{key}</span>{' '}
-                                {typeof value === 'object' && value !== null && 'type' in value ? (
-                                  // New format: { type: 'string', description: '...' }
-                                  <span className='text-green-500'>{value.type}</span>
-                                ) : typeof value === 'object' && value !== null ? (
-                                  // Legacy complex object format
-                                  <div className='mt-1 pl-3'>
-                                    {Object.entries(value).map(([typeKey, typeValue]) => (
-                                      <div key={typeKey} className='flex items-start'>
-                                        <span className='font-medium text-blue-500'>
-                                          {typeKey}:
-                                        </span>
-                                        <span className='ml-1 text-green-500'>
-                                          {typeValue as string}
-                                        </span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  // Old format: just a string
-                                  <span className='text-green-500'>{value as string}</span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                <TooltipContent side='top' className='max-w-[300px] p-4'>
+                  <div className='space-y-3'>
+                    <div>
+                      <p className='mb-1 font-medium text-sm'>Description</p>
+                      <p className='text-muted-foreground text-sm'>{config.longDescription}</p>
                     </div>
-                  </TooltipContent>
-                </Tooltip>
-              )
+                    {config.outputs && (
+                      <div>
+                        <p className='mb-1 font-medium text-sm'>Output</p>
+                        <div className='text-sm'>
+                          {Object.entries(config.outputs).map(([key, value]) => (
+                            <div key={key} className='mb-1'>
+                              <span className='text-muted-foreground'>{key}</span>{' '}
+                              {typeof value === 'object' && value !== null && 'type' in value ? (
+                                // New format: { type: 'string', description: '...' }
+                                <span className='text-green-500'>{value.type}</span>
+                              ) : typeof value === 'object' && value !== null ? (
+                                // Legacy complex object format
+                                <div className='mt-1 pl-3'>
+                                  {Object.entries(value).map(([typeKey, typeValue]) => (
+                                    <div key={typeKey} className='flex items-start'>
+                                      <span className='font-medium text-blue-500'>
+                                        {typeKey}:
+                                      </span>
+                                      <span className='ml-1 text-green-500'>
+                                        {typeValue as string}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                // Old format: just a string
+                                <span className='text-green-500'>{value as string}</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             )}
             <Tooltip>
               <TooltipTrigger asChild>

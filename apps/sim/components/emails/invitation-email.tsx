@@ -26,7 +26,7 @@ interface InvitationEmailProps {
   updatedDate?: Date
 }
 
-const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://sim.ai'
+const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://app.buildnuggets.ai'
 
 export const InvitationEmail = ({
   inviterName = 'A team member',
@@ -57,7 +57,7 @@ export const InvitationEmail = ({
     <Html>
       <Head />
       <Body style={baseStyles.main}>
-        <Preview>You've been invited to join {organizationName} on Sim</Preview>
+        <Preview>You've been invited to join {organizationName} on Nuggets</Preview>
         <Container style={baseStyles.container}>
           <Section style={{ padding: '30px 0', textAlign: 'center' }}>
             <Row>
@@ -86,7 +86,7 @@ export const InvitationEmail = ({
             <Text style={baseStyles.paragraph}>Hello,</Text>
             <Text style={baseStyles.paragraph}>
               <strong>{inviterName}</strong> has invited you to join{' '}
-              <strong>{organizationName}</strong> on Sim. Sim is a powerful, user-friendly platform
+              <strong>{organizationName}</strong> on Nuggets. Nuggets is a powerful, user-friendly platform
               for building, testing, and optimizing agentic workflows.
             </Text>
             <Link href={enhancedLink} style={{ textDecoration: 'none' }}>
@@ -99,7 +99,7 @@ export const InvitationEmail = ({
             <Text style={baseStyles.paragraph}>
               Best regards,
               <br />
-              The Sim Team
+              The Nuggets Team
             </Text>
             <Text
               style={{
@@ -110,7 +110,7 @@ export const InvitationEmail = ({
               }}
             >
               This email was sent on {format(updatedDate, 'MMMM do, yyyy')} to {invitedEmail} with
-              an invitation to join {organizationName} on Sim.
+              an invitation to join {organizationName} on Nuggets.
             </Text>
           </Section>
         </Container>

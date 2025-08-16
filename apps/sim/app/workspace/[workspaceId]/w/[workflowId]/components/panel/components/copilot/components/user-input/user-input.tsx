@@ -472,7 +472,7 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
           className={cn(
             'rounded-[8px] border border-[#E5E5E5] bg-[#FFFFFF] p-2 shadow-xs transition-all duration-200 dark:border-[#414141] dark:bg-[var(--surface-elevated)]',
             isDragging &&
-              'border-[var(--brand-primary-hover-hex)] bg-purple-50/50 dark:border-[var(--brand-primary-hover-hex)] dark:bg-purple-950/20'
+              'border-[#c56200] bg-purple-50/50 dark:border-[#c56200] dark:bg-purple-950/20'
           )}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
@@ -796,7 +796,7 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
                   onClick={handleSubmit}
                   disabled={!canSubmit}
                   size='icon'
-                  className='h-6 w-6 rounded-full bg-[var(--brand-primary-hover-hex)] text-white shadow-[0_0_0_0_var(--brand-primary-hover-hex)] transition-all duration-200 hover:bg-[var(--brand-primary-hover-hex)] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
+                  className='h-6 w-6 rounded-full bg-[#c56200] text-white shadow-[0_0_0_0_#c56200] transition-all duration-200 hover:bg-[#7028E6] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
                 >
                   {isLoading ? (
                     <Loader2 className='h-3 w-3 animate-spin' />

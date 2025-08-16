@@ -186,7 +186,7 @@ export function ApiKeys({ onOpenChange }: ApiKeysProps) {
             </div>
             <h3 className='mt-4 font-medium text-lg'>No API keys yet</h3>
             <p className='mt-2 max-w-sm text-muted-foreground text-sm'>
-              You don&apos;t have any API keys yet. Create one to get started with the Sim SDK.
+              You don&apos;t have any API keys yet. Create one to get started with the Nuggets SDK.
             </p>
             <Button
               variant='default'

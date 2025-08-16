@@ -226,12 +226,12 @@ export const WEBHOOK_PROVIDERS: { [key: string]: WebhookProvider } = {
       <div
         className={`flex items-center justify-center rounded ${props.className || ''}`}
         style={{
-          backgroundColor: 'var(--brand-primary-hover-hex)',
+          backgroundColor: '#c56200',
           minWidth: '28px',
           padding: '0 4px',
         }}
       >
-        <span className='font-medium text-white text-xs'>Sim</span>
+        <span className='font-medium text-white text-xs'>Nuggets</span>
       </div>
     ),
     configFields: {

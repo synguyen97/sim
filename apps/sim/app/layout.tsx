@@ -80,17 +80,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property='og:image:height' content='630' />
         <meta
           property='og:image:alt'
-          content='Sim - AI Agent Builder with Visual Canvas Interface'
+          content='Nuggets - AI Agent Builder with Visual Canvas Interface'
         />
-        <meta property='og:site_name' content='Sim' />
+        <meta property='og:site_name' content='Nuggets' />
         <meta property='og:locale' content='en_US' />
 
         {/* Twitter Card tags */}
         <meta name='twitter:image:width' content='1200' />
         <meta name='twitter:image:height' content='675' />
-        <meta name='twitter:image:alt' content='Sim - AI Agent Builder' />
-        <meta name='twitter:url' content='https://sim.ai' />
-        <meta name='twitter:domain' content='sim.ai' />
+        <meta name='twitter:image:alt' content='Nuggets - AI Agent Builder' />
 
         {/* Additional image sources */}
         <link rel='image_src' href={getAssetUrl('social/facebook.png')} />

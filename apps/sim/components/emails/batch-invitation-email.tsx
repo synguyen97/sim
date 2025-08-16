@@ -72,7 +72,7 @@ export const BatchInvitationEmail = ({
         <Container style={container}>
           <Section style={logoContainer}>
             <Img
-              src={brand.logoUrl || 'https://sim.ai/logo.png'}
+              src={brand.logoUrl || 'https://app.buildnuggets.ai/logo.png'}
               width='120'
               height='36'
               alt={brand.name}
@@ -84,7 +84,7 @@ export const BatchInvitationEmail = ({
 
           <Text style={text}>
             <strong>{inviterName}</strong> has invited you to join{' '}
-            <strong>{organizationName}</strong> on Sim.
+            <strong>{organizationName}</strong> on Nuggets.
           </Text>
 
           {/* Organization Invitation Details */}

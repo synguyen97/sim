@@ -48,7 +48,7 @@ export function ActionBar({ blockId, blockType, disabled = false }: ActionBarPro
           <Button
             className={cn(
               isEnabled
-                ? 'bg-[var(--brand-primary-hover-hex)] hover:bg-[var(--brand-primary-hover-hex)]/90'
+                ? 'bg-[#c56200] hover:bg-[#c56200]/90'
                 : 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed'
             )}
             size="sm"

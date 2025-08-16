@@ -25,12 +25,33 @@ interface BlockItem {
 export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }: ToolbarProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
+  const hiddenBlockNames = [
+    'Confluence',
+    'Microsoft Excel',
+    'Microsoft Planner', 
+    'Microsoft Teams',
+    'Mistral Parser',
+    'OneDrive',
+    'Outlook',
+    'Pinecone',
+    'S3',
+    'Sharepoint',
+    'Stagehand Agent',
+    'Stagehand Extract',
+    'Supabase',
+    'Tavily',
+    'Vision',
+    'Wealthbox',
+  ]
+
   const { regularBlocks, specialBlocks, tools, triggers } = useMemo(() => {
     const allBlocks = getAllBlocks()
 
-    // Filter blocks based on search query
+    // Filter blocks based on search query AND hidden block names
     const filteredBlocks = allBlocks.filter((block) => {
       if (block.type === 'starter' || block.hideFromToolbar) return false
+      
+      if (hiddenBlockNames.includes(block.name)) return false
 
       return (
         !searchQuery.trim() ||
@@ -96,7 +117,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
       triggers: triggerBlockItems,
     }
   }, [searchQuery])
-
+  
   return (
     <div className='flex h-full flex-col'>
       {/* Search */}
@@ -104,7 +125,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
         <div className='flex h-9 items-center gap-2 rounded-[8px] border bg-background pr-2 pl-3'>
           <Search className='h-4 w-4 text-muted-foreground' strokeWidth={2} />
           <Input
-            placeholder='Search blocks...'
+            placeholder='Search nuggets...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className='h-6 flex-1 border-0 bg-transparent px-0 text-muted-foreground text-sm leading-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0'

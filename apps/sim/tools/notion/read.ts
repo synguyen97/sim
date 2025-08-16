@@ -34,7 +34,7 @@ export const notionReadTool: ToolConfig<NotionReadParams, NotionResponse> = {
       const formattedId = params.pageId.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')
 
       // Use the page endpoint to get page properties
-      return `https://api.notion.com/v1/pages/${formattedId}`
+      return `https://api.notion.com/v1/pages/${params.pageId}`
     },
     method: 'GET',
     headers: (params: NotionReadParams) => {
@@ -91,7 +91,7 @@ export const notionReadTool: ToolConfig<NotionReadParams, NotionResponse> = {
 
     // Fetch page content using blocks endpoint
     const blocksResponse = await fetch(
-      `https://api.notion.com/v1/blocks/${formattedId}/children?page_size=100`,
+      `https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`,
       {
         method: 'GET',
         headers: {

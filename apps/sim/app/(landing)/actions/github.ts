@@ -20,25 +20,7 @@ function formatNumber(num: number): string {
  */
 export async function getFormattedGitHubStars(): Promise<string> {
   try {
-    const token = env.GITHUB_TOKEN
-
-    const response = await fetch('https://api.github.com/repos/simstudioai/sim', {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'SimStudio/1.0',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      next: { revalidate: 3600 },
-    })
-
-    if (!response.ok) {
-      console.error(`GitHub API error: ${response.status} ${response.statusText}`)
-      return formatNumber(3867)
-    }
-
-    const data = await response.json()
-    return formatNumber(data.stargazers_count || 3867)
+    return formatNumber(123)
   } catch (error) {
     console.error('Error fetching GitHub stars:', error)
     return formatNumber(3867)

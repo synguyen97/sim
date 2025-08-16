@@ -1165,6 +1165,12 @@ interface KeyboardShortcutProps {
 }
 
 const KeyboardShortcut = ({ shortcut, className }: KeyboardShortcutProps) => {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const parts = shortcut.split('+')
 
   // Helper function to determine if a part is a symbol that should be larger
@@ -1175,13 +1181,17 @@ const KeyboardShortcut = ({ shortcut, className }: KeyboardShortcutProps) => {
   return (
     <kbd
       className={cn(
-        'flex h-6 w-8 items-center justify-center rounded-[5px] border border-border bg-background font-mono text-[#CDCDCD] text-xs dark:text-[#454545]',
+        'flex h-6 w-12 items-center justify-center rounded-[5px] border border-border bg-background font-mono text-[#CDCDCD] text-xs dark:text-[#454545]',
         className
       )}
     >
-      <span className='flex items-center justify-center gap-[1px] pt-[1px]'>
+      <span className='flex items-center justify-center gap-[2px] pt-[1px]'>
         {parts.map((part, index) => (
-          <span key={index} className={cn(isSymbol(part) ? 'text-[17px]' : 'text-xs')}>
+          <span
+            key={index}
+            className={isClient ? 'text-[xs]' : 'text-xs'}
+            suppressHydrationWarning
+          >
             {part}
           </span>
         ))}
@@ -1219,9 +1229,8 @@ const NavigationItem = ({ item }: NavigationItemProps) => {
       className={cn(
         'h-[42px] w-[42px] rounded-[10px] border bg-background text-foreground shadow-xs transition-all duration-200',
         isGrayHover && 'hover:bg-secondary',
-        !isGrayHover &&
-          'hover:border-[var(--brand-primary-hex)] hover:bg-[var(--brand-primary-hex)] hover:text-white',
-        item.active && 'border-[var(--brand-primary-hex)] bg-[var(--brand-primary-hex)] text-white'
+        !isGrayHover && 'hover:border-[#ff9100] hover:bg-[#ff9100] hover:text-white',
+        item.active && 'border-[#ff9100] bg-[#ff9100] text-white'
       )}
     >
       <item.icon className='h-4 w-4' />

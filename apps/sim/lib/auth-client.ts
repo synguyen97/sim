@@ -34,10 +34,11 @@ export const client = createAuthClient({
         ]
       : []),
     organizationClient(),
-  ],
+  ]
 })
 
-export const { useSession, useActiveOrganization } = client
+// Keep other exports
+export const { useActiveOrganization } = client
 
 export const useSubscription = () => {
   // In development, provide mock implementations
@@ -60,5 +61,8 @@ export const useSubscription = () => {
     restore: client.subscription?.restore,
   }
 }
+
+export { useSession } from './useSession';
+
 
 export const { signIn, signUp, signOut } = client

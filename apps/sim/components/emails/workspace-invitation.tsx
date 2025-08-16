@@ -23,7 +23,7 @@ interface WorkspaceInvitationEmailProps {
   invitationLink?: string
 }
 
-const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://sim.ai'
+const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://app.buildnuggets.ai'
 
 export const WorkspaceInvitationEmail = ({
   workspaceName = 'Workspace',
@@ -52,7 +52,7 @@ export const WorkspaceInvitationEmail = ({
     <Html>
       <Head />
       <Body style={baseStyles.main}>
-        <Preview>You've been invited to join the "{workspaceName}" workspace on Sim!</Preview>
+        <Preview>You've been invited to join the "{workspaceName}" workspace on Nuggets!</Preview>
         <Container style={baseStyles.container}>
           <Section style={{ padding: '30px 0', textAlign: 'center' }}>
             <Row>
@@ -80,10 +80,10 @@ export const WorkspaceInvitationEmail = ({
           <Section style={baseStyles.content}>
             <Text style={baseStyles.paragraph}>Hello,</Text>
             <Text style={baseStyles.paragraph}>
-              {inviterName} has invited you to join the "{workspaceName}" workspace on Sim!
+              {inviterName} has invited you to join the "{workspaceName}" workspace on Nuggets!
             </Text>
             <Text style={baseStyles.paragraph}>
-              Sim is a powerful platform for building, testing, and optimizing AI workflows. Join
+              Nuggets is a powerful platform for building, testing, and optimizing AI workflows. Join
               this workspace to collaborate with your team.
             </Text>
             <Link href={enhancedLink} style={{ textDecoration: 'none' }}>
@@ -96,7 +96,7 @@ export const WorkspaceInvitationEmail = ({
             <Text style={baseStyles.paragraph}>
               Best regards,
               <br />
-              The Sim Team
+              The Nuggets Team
             </Text>
           </Section>
         </Container>

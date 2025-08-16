@@ -685,7 +685,7 @@ export function Document({
                   onClick={() => setIsCreateChunkModalOpen(true)}
                   disabled={documentData?.processingStatus === 'failed' || !userPermissions.canEdit}
                   size='sm'
-                  className='flex items-center gap-1 bg-[var(--brand-primary-hex)] font-[480] text-white shadow-[0_0_0_0_var(--brand-primary-hex)] transition-all duration-200 hover:bg-[var(--brand-secondary-hex)] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)] disabled:cursor-not-allowed disabled:opacity-50'
+                  className='flex items-center gap-1 bg-[#ff9100] font-[480] text-white shadow-[0_0_0_0_#ff9100] transition-all duration-200 hover:bg-[#6518E6] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)] disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   <Plus className='h-3.5 w-3.5' />
                   <span>Create Chunk</span>
@@ -701,62 +701,317 @@ export function Document({
                 </div>
               )}
 
-              {
-                /* Table container */
-                <div className='flex flex-1 flex-col overflow-hidden'>
-                  {/* Table header - fixed */}
-                  <div className='sticky top-0 z-10 border-b bg-background'>
-                    <table className='w-full table-fixed'>
-                      <colgroup>
-                        <col className='w-[5%]' />
-                        <col className='w-[8%]' />
-                        <col className='w-[55%]' />
-                        <col className='w-[10%]' />
-                        <col className='w-[10%]' />
-                        <col className='w-[12%]' />
-                      </colgroup>
-                      <thead>
-                        <tr>
-                          <th className='px-4 pt-2 pb-3 text-left font-medium'>
-                            <Checkbox
-                              checked={isAllSelected}
-                              onCheckedChange={handleSelectAll}
-                              disabled={
-                                documentData?.processingStatus !== 'completed' ||
-                                !userPermissions.canEdit
-                              }
-                              aria-label='Select all chunks'
-                              className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[var(--brand-primary-hex)]/20 data-[state=checked]:border-[var(--brand-primary-hex)] data-[state=checked]:bg-[var(--brand-primary-hex)] [&>*]:h-3 [&>*]:w-3'
-                            />
-                          </th>
-                          <th className='px-4 pt-2 pb-3 text-left font-medium'>
-                            <span className='text-muted-foreground text-xs leading-none'>
-                              Index
-                            </span>
-                          </th>
-                          <th className='px-4 pt-2 pb-3 text-left font-medium'>
-                            <span className='text-muted-foreground text-xs leading-none'>
-                              Content
-                            </span>
-                          </th>
-                          <th className='px-4 pt-2 pb-3 text-left font-medium'>
-                            <span className='text-muted-foreground text-xs leading-none'>
-                              Tokens
-                            </span>
-                          </th>
-                          <th className='px-4 pt-2 pb-3 text-left font-medium'>
-                            <span className='text-muted-foreground text-xs leading-none'>
-                              Status
-                            </span>
-                          </th>
-                          <th className='px-4 pt-2 pb-3 text-left font-medium'>
-                            <span className='text-muted-foreground text-xs leading-none'>
-                              Actions
-                            </span>
-                          </th>
+              {/* Table container */}
+              <div className='flex flex-1 flex-col overflow-hidden'>
+                {/* Table header - fixed */}
+                <div className='sticky top-0 z-10 border-b bg-background'>
+                  <table className='w-full table-fixed'>
+                    <colgroup>
+                      <col className='w-[5%]' />
+                      <col className='w-[8%]' />
+                      <col className='w-[55%]' />
+                      <col className='w-[10%]' />
+                      <col className='w-[10%]' />
+                      <col className='w-[12%]' />
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th className='px-4 pt-2 pb-3 text-left font-medium'>
+                          <Checkbox
+                            checked={isAllSelected}
+                            onCheckedChange={handleSelectAll}
+                            disabled={
+                              documentData?.processingStatus !== 'completed' ||
+                              !userPermissions.canEdit
+                            }
+                            aria-label='Select all chunks'
+                            className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[#ff9100]/20 data-[state=checked]:border-[#ff9100] data-[state=checked]:bg-[#ff9100] [&>*]:h-3 [&>*]:w-3'
+                          />
+                        </th>
+                        <th className='px-4 pt-2 pb-3 text-left font-medium'>
+                          <span className='text-muted-foreground text-xs leading-none'>Index</span>
+                        </th>
+                        <th className='px-4 pt-2 pb-3 text-left font-medium'>
+                          <span className='text-muted-foreground text-xs leading-none'>
+                            Content
+                          </span>
+                        </th>
+                        <th className='px-4 pt-2 pb-3 text-left font-medium'>
+                          <span className='text-muted-foreground text-xs leading-none'>Tokens</span>
+                        </th>
+                        <th className='px-4 pt-2 pb-3 text-left font-medium'>
+                          <span className='text-muted-foreground text-xs leading-none'>Status</span>
+                        </th>
+                        <th className='px-4 pt-2 pb-3 text-left font-medium'>
+                          <span className='text-muted-foreground text-xs leading-none'>
+                            Actions
+                          </span>
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+
+                {/* Table body - scrollable */}
+                <div className='flex-1 overflow-auto'>
+                  <table className='w-full table-fixed'>
+                    <colgroup>
+                      <col className='w-[5%]' />
+                      <col className='w-[8%]' />
+                      <col className='w-[55%]' />
+                      <col className='w-[10%]' />
+                      <col className='w-[10%]' />
+                      <col className='w-[12%]' />
+                    </colgroup>
+                    <tbody>
+                      {documentData?.processingStatus !== 'completed' ? (
+                        <tr className='border-b transition-colors'>
+                          <td className='px-4 py-3'>
+                            <div className='h-3.5 w-3.5' />
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='flex items-center gap-2'>
+                              <FileText className='h-5 w-5 text-muted-foreground' />
+                              <span className='text-muted-foreground text-sm italic'>
+                                {documentData?.processingStatus === 'pending' &&
+                                  'Document processing pending...'}
+                                {documentData?.processingStatus === 'processing' &&
+                                  'Document processing in progress...'}
+                                {documentData?.processingStatus === 'failed' &&
+                                  'Document processing failed'}
+                                {!documentData?.processingStatus && 'Document not ready'}
+                              </span>
+                            </div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
                         </tr>
-                      </thead>
-                    </table>
+                      ) : paginatedChunks.length === 0 && !isLoadingAllChunks ? (
+                        <tr className='border-b transition-colors hover:bg-accent/30'>
+                          <td className='px-4 py-3'>
+                            <div className='h-3.5 w-3.5' />
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='flex items-center gap-2'>
+                              <FileText className='h-5 w-5 text-muted-foreground' />
+                              <span className='text-muted-foreground text-sm italic'>
+                                {documentData?.processingStatus === 'completed'
+                                  ? searchQuery.trim()
+                                    ? 'No chunks match your search'
+                                    : 'No chunks found'
+                                  : 'Document is still processing...'}
+                              </span>
+                            </div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <div className='text-muted-foreground text-xs'>—</div>
+                          </td>
+                        </tr>
+                      ) : isLoadingAllChunks ? (
+                        // Show loading skeleton rows when chunks are loading
+                        Array.from({ length: 5 }).map((_, index) => (
+                          <tr key={`loading-${index}`} className='border-b transition-colors'>
+                            <td className='px-4 py-3'>
+                              <div className='h-3.5 w-3.5 animate-pulse rounded bg-muted' />
+                            </td>
+                            <td className='px-4 py-3'>
+                              <div className='h-4 w-8 animate-pulse rounded bg-muted' />
+                            </td>
+                            <td className='px-4 py-3'>
+                              <div className='h-4 w-full animate-pulse rounded bg-muted' />
+                            </td>
+                            <td className='px-4 py-3'>
+                              <div className='h-4 w-12 animate-pulse rounded bg-muted' />
+                            </td>
+                            <td className='px-4 py-3'>
+                              <div className='h-4 w-12 animate-pulse rounded bg-muted' />
+                            </td>
+                            <td className='px-4 py-3'>
+                              <div className='h-4 w-16 animate-pulse rounded bg-muted' />
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        paginatedChunks.map((chunk: ChunkData) => (
+                          <tr
+                            key={chunk.id}
+                            className='cursor-pointer border-b transition-colors hover:bg-accent/30'
+                            onClick={() => handleChunkClick(chunk)}
+                          >
+                            {/* Select column */}
+                            <td className='px-4 py-3'>
+                              <Checkbox
+                                checked={selectedChunks.has(chunk.id)}
+                                onCheckedChange={(checked) =>
+                                  handleSelectChunk(chunk.id, checked as boolean)
+                                }
+                                disabled={!userPermissions.canEdit}
+                                aria-label={`Select chunk ${chunk.chunkIndex}`}
+                                className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[#ff9100]/20 data-[state=checked]:border-[#ff9100] data-[state=checked]:bg-[#ff9100] [&>*]:h-3 [&>*]:w-3'
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </td>
+
+                            {/* Index column */}
+                            <td className='px-4 py-3'>
+                              <div className='font-mono text-sm'>{chunk.chunkIndex}</div>
+                            </td>
+
+                            {/* Content column */}
+                            <td className='px-4 py-3'>
+                              <div className='text-sm' title={chunk.content}>
+                                <SearchHighlight
+                                  text={truncateContent(chunk.content)}
+                                  searchQuery={searchQuery}
+                                />
+                              </div>
+                            </td>
+
+                            {/* Tokens column */}
+                            <td className='px-4 py-3'>
+                              <div className='text-xs'>
+                                {chunk.tokenCount > 1000
+                                  ? `${(chunk.tokenCount / 1000).toFixed(1)}k`
+                                  : chunk.tokenCount}
+                              </div>
+                            </td>
+
+                            {/* Status column */}
+                            <td className='px-4 py-3'>
+                              <div className={getStatusBadgeStyles(chunk.enabled)}>
+                                <span className='font-medium'>
+                                  {chunk.enabled ? 'Enabled' : 'Disabled'}
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* Actions column */}
+                            <td className='px-4 py-3'>
+                              <div className='flex items-center gap-1'>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant='ghost'
+                                      size='sm'
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleToggleEnabled(chunk.id)
+                                      }}
+                                      disabled={!userPermissions.canEdit}
+                                      className='h-8 w-8 p-0 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50'
+                                    >
+                                      {chunk.enabled ? (
+                                        <Circle className='h-4 w-4' />
+                                      ) : (
+                                        <CircleOff className='h-4 w-4' />
+                                      )}
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side='top'>
+                                    {chunk.enabled ? 'Disable Chunk' : 'Enable Chunk'}
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant='ghost'
+                                      size='sm'
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleDeleteChunk(chunk.id)
+                                      }}
+                                      disabled={!userPermissions.canEdit}
+                                      className='h-8 w-8 p-0 text-gray-500 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50'
+                                    >
+                                      <Trash2 className='h-4 w-4' />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side='top'>Delete Chunk</TooltipContent>
+                                </Tooltip>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                {documentData?.processingStatus === 'completed' && totalPages > 1 && (
+                  <div className='flex items-center justify-center border-t bg-background px-6 py-4'>
+                    <div className='flex items-center gap-1'>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={prevPage}
+                        disabled={!hasPrevPage || isLoadingAllChunks}
+                        className='h-8 w-8 p-0'
+                      >
+                        <ChevronLeft className='h-4 w-4' />
+                      </Button>
+
+                      {/* Page numbers - show a few around current page */}
+                      <div className='mx-4 flex items-center gap-6'>
+                        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                          let page: number
+                          if (totalPages <= 5) {
+                            page = i + 1
+                          } else if (currentPage <= 3) {
+                            page = i + 1
+                          } else if (currentPage >= totalPages - 2) {
+                            page = totalPages - 4 + i
+                          } else {
+                            page = currentPage - 2 + i
+                          }
+
+                          if (page < 1 || page > totalPages) return null
+
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => goToPage(page)}
+                              disabled={isLoadingAllChunks}
+                              className={`font-medium text-sm transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 ${
+                                page === currentPage ? 'text-foreground' : 'text-muted-foreground'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={nextPage}
+                        disabled={!hasNextPage || isLoadingAllChunks}
+                        className='h-8 w-8 p-0'
+                      >
+                        <ChevronRight className='h-4 w-4' />
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Table body - scrollable */}

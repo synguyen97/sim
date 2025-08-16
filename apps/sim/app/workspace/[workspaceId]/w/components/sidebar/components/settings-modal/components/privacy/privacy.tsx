@@ -86,7 +86,7 @@ export function Privacy() {
 
       <div className='border-t pt-4'>
         <p className='text-muted-foreground text-xs'>
-          We use OpenTelemetry to collect anonymous usage data to improve Sim. All data is collected
+          We use OpenTelemetry to collect anonymous usage data to improve Nuggets. All data is collected
           in accordance with our privacy policy, and you can opt-out at any time. This setting
           applies to your account on all devices.
         </p>

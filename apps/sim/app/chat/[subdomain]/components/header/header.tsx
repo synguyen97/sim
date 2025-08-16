@@ -16,7 +16,7 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ chatConfig, starCount }: ChatHeaderProps) {
-  const primaryColor = chatConfig?.customizations?.primaryColor || 'var(--brand-primary-hex)'
+  const primaryColor = chatConfig?.customizations?.primaryColor || '#ff9100'
   const customImage = chatConfig?.customizations?.imageUrl || chatConfig?.customizations?.logoUrl
 
   return (
@@ -29,7 +29,7 @@ export function ChatHeader({ chatConfig, starCount }: ChatHeaderProps) {
             className='h-12 w-12 rounded-md object-cover'
           />
         ) : (
-          // Default Sim Studio logo when no custom image is provided
+          // Default Nuggets Studio logo when no custom image is provided
           <div
             className='flex h-12 w-12 items-center justify-center rounded-md'
             style={{ backgroundColor: primaryColor }}
@@ -84,7 +84,7 @@ export function ChatHeader({ chatConfig, starCount }: ChatHeaderProps) {
           <span className='hidden font-medium text-sm sm:inline-block'>{starCount}</span>
         </a>
         <a
-          href='https://sim.ai'
+          href='https://app.buildnuggets.ai'
           target='_blank'
           rel='noopener noreferrer'
           className='flex items-center rounded-md p-1 text-foreground/80 transition-colors duration-200 hover:text-foreground/100'

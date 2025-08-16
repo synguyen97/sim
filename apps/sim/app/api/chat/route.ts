@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
       // Merge customizations with the additional fields
       const mergedCustomizations = {
         ...(customizations || {}),
-        primaryColor: customizations?.primaryColor || 'var(--brand-primary-hover-hex)',
+        primaryColor: customizations?.primaryColor || '#c56200',
         welcomeMessage: customizations?.welcomeMessage || 'Hi there! How can I help you today?',
       }
 

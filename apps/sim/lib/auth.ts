@@ -166,7 +166,7 @@ export const auth = betterAuth({
       const html = await renderPasswordResetEmail(username, url)
 
       const result = await resend.emails.send({
-        from: `Sim <team@${env.EMAIL_DOMAIN || getEmailDomain()}>`,
+        from: `Nuggets <team@${env.EMAIL_DOMAIN || getEmailDomain()}>`,
         to: user.email,
         subject: getEmailSubject('reset-password'),
         html,
@@ -267,7 +267,7 @@ export const auth = betterAuth({
 
           // In production, send an actual email
           const result = await resend.emails.send({
-            from: `Sim <onboarding@${env.EMAIL_DOMAIN || getEmailDomain()}>`,
+            from: `Nuggets <onboarding@${env.EMAIL_DOMAIN || getEmailDomain()}>`,
             to: data.email,
             subject: getEmailSubject(data.type),
             html,
@@ -1528,9 +1528,9 @@ export const auth = betterAuth({
                 )
 
                 await resend.emails.send({
-                  from: `Sim <team@${env.EMAIL_DOMAIN || getEmailDomain()}>`,
+                  from: `Nuggets <team@${env.EMAIL_DOMAIN || getEmailDomain()}>`,
                   to: invitation.email,
-                  subject: `${inviterName} has invited you to join ${organization.name} on Sim`,
+                  subject: `${inviterName} has invited you to join ${organization.name} on Nuggets`,
                   html,
                 })
               } catch (error) {

@@ -141,21 +141,9 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
             <div className={cn('h-full', activeSection === 'apikeys' ? 'block' : 'hidden')}>
               <ApiKeys onOpenChange={onOpenChange} />
             </div>
-            {isSubscriptionEnabled && (
-              <div className={cn('h-full', activeSection === 'subscription' ? 'block' : 'hidden')}>
-                <Subscription onOpenChange={onOpenChange} />
-              </div>
-            )}
-            {isBillingEnabled && (
-              <div className={cn('h-full', activeSection === 'team' ? 'block' : 'hidden')}>
-                <TeamManagement />
-              </div>
-            )}
-            {isHosted && (
-              <div className={cn('h-full', activeSection === 'copilot' ? 'block' : 'hidden')}>
-                <Copilot />
-              </div>
-            )}
+            <div className={cn('h-full', activeSection === 'team' ? 'block' : 'hidden')}>
+              <TeamManagement />
+            </div>
             <div className={cn('h-full', activeSection === 'privacy' ? 'block' : 'hidden')}>
               <Privacy />
             </div>
