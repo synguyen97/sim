@@ -33,14 +33,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Mistral Parser',
     'OneDrive',
     'Outlook',
-    'Pinecone',
-    'S3',
     'Sharepoint',
-    'Stagehand Agent',
-    'Stagehand Extract',
-    'Supabase',
-    'Tavily',
-    'Vision',
     'Wealthbox',
   ]
 
