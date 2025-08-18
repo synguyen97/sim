@@ -27,13 +27,26 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
 
   const hiddenBlockNames = [
     'Confluence',
+    'Discord',
+    'ElevenLabs',
+    'GitHub',
+    'Hugging Face',
+    'Jira',
     'Microsoft Excel',
     'Microsoft Planner', 
     'Microsoft Teams',
     'Mistral Parser',
     'OneDrive',
     'Outlook',
+    'Reddit',
     'Sharepoint',
+    'Telegram',
+    'Twilio SMS',
+    'Typeform',
+    'WhatsApp',
+    'Wikipedia',
+    'X',
+    'Youtube',
     'Wealthbox',
   ]
 
