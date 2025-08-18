@@ -25,21 +25,30 @@ interface BlockItem {
 export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }: ToolbarProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
-  const hiddenBlockNames = [
+  // Blocks to show only in specialBlocks, tools, and triggers sections
+  const priorityBlockNames = [
+    'Google Calendar',
+    'Google Docs', 
+    'Google Drive',
+    'Google Search',
+    'Google Sheets',
+    'Slack',
+    'Notion',
     'Confluence',
     'Discord',
     'ElevenLabs',
     'GitHub',
+    'Linear',
+    'Airtable',
     'Hugging Face',
     'Jira',
     'Microsoft Excel',
-    'Microsoft Planner', 
+    'Microsoft Planner',
     'Microsoft Teams',
-    'Mistral Parser',
     'OneDrive',
     'Outlook',
     'Reddit',
-    'Sharepoint',
+    'SharePoint',
     'Telegram',
     'Twilio SMS',
     'Typeform',
@@ -47,17 +56,14 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Wikipedia',
     'X',
     'Youtube',
-    'Wealthbox',
   ]
 
   const { regularBlocks, specialBlocks, tools, triggers } = useMemo(() => {
     const allBlocks = getAllBlocks()
 
-    // Filter blocks based on search query AND hidden block names
+    // Filter blocks based on search query
     const filteredBlocks = allBlocks.filter((block) => {
       if (block.type === 'starter' || block.hideFromToolbar) return false
-      
-      if (hiddenBlockNames.includes(block.name)) return false
 
       return (
         !searchQuery.trim() ||
@@ -67,9 +73,17 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     })
 
     // Separate blocks by category: 'blocks', 'tools', and 'triggers'
-    const regularBlockConfigs = filteredBlocks.filter((block) => block.category === 'blocks')
-    const toolConfigs = filteredBlocks.filter((block) => block.category === 'tools')
-    const triggerConfigs = filteredBlocks.filter((block) => block.category === 'triggers')
+    const regularBlockConfigs = filteredBlocks.filter((block) => 
+      block.category === 'blocks' && !priorityBlockNames.includes(block.name)
+    )
+    
+    const toolConfigs = filteredBlocks.filter((block) => 
+      block.category === 'tools' && priorityBlockNames.includes(block.name)
+    )
+    
+    const triggerConfigs = filteredBlocks.filter((block) => 
+      block.category === 'triggers' && priorityBlockNames.includes(block.name)
+    )
 
     // Create regular block items and sort alphabetically
     const regularBlockItems: BlockItem[] = regularBlockConfigs
@@ -81,9 +95,10 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
       }))
       .sort((a, b) => a.name.localeCompare(b.name))
 
-    // Create special blocks (loop and parallel) if they match search
+    // Create special blocks (loop, parallel, and priority blocks)
     const specialBlockItems: BlockItem[] = []
 
+    // Add Loop and Parallel if they match search
     if (!searchQuery.trim() || 'loop'.toLowerCase().includes(searchQuery.toLowerCase())) {
       specialBlockItems.push({
         name: 'Loop',
@@ -99,6 +114,20 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
         isCustom: true,
       })
     }
+
+    // Add priority blocks that are in 'blocks' category to special blocks
+    const prioritySpecialBlocks = filteredBlocks.filter((block) => 
+      block.category === 'blocks' && priorityBlockNames.includes(block.name)
+    )
+
+    prioritySpecialBlocks.forEach((block) => {
+      specialBlockItems.push({
+        name: block.name,
+        type: block.type,
+        config: block,
+        isCustom: false,
+      })
+    })
 
     // Sort special blocks alphabetically
     specialBlockItems.sort((a, b) => a.name.localeCompare(b.name))
