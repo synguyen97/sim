@@ -56,6 +56,8 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Wikipedia',
     'X',
     'Youtube',
+    'Schedule',
+    'Webhook'
   ]
 
   const { regularBlocks, specialBlocks, tools, triggers } = useMemo(() => {
