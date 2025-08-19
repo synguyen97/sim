@@ -440,6 +440,10 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
       setAgentDepth(nextDepth)
     }
 
+    useEffect(() => {
+      setAgentDepth(1);
+    }, [])
+
     const getCollapsedModeLabel = () => {
       const base = getDepthLabelFor(agentDepth)
       return !agentPrefetch ? `${base} MAX` : base
@@ -632,7 +636,7 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
               </DropdownMenu>
               {
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenuTrigger asChild disabled>
                     <Button
                       variant='ghost'
                       size='sm'
