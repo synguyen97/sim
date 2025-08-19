@@ -205,7 +205,7 @@ export const env = createEnv({
 
   // Variables available on both server and client
   shared: {
-    NODE_ENV:                             z.enum(['development', 'test', 'production']).optional(), // Runtime environment
+    NODE_ENV:                             z.enum(['production', 'test', 'development']).optional(), // Runtime environment
     NEXT_TELEMETRY_DISABLED:              z.string().optional(),                // Disable Next.js telemetry collection
   },
 
