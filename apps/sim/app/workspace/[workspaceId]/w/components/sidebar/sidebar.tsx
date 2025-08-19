@@ -957,13 +957,13 @@ export function Sidebar() {
       shortcut: getKeyboardShortcutText('L', true, true),
       active: pathname === `/workspace/${workspaceId}/logs`,
     },
-    {
-      id: 'knowledge',
-      icon: LibraryBig,
-      href: `/workspace/${workspaceId}/knowledge`,
-      tooltip: 'Knowledge',
-      active: pathname === `/workspace/${workspaceId}/knowledge`,
-    },
+    // {
+    //   id: 'knowledge',
+    //   icon: LibraryBig,
+    //   href: `/workspace/${workspaceId}/knowledge`,
+    //   tooltip: 'Knowledge',
+    //   active: pathname === `/workspace/${workspaceId}/knowledge`,
+    // },
     {
       id: 'templates',
       icon: Shapes,
@@ -1229,7 +1229,7 @@ const NavigationItem = ({ item }: NavigationItemProps) => {
       className={cn(
         'h-[42px] w-[42px] rounded-[10px] border bg-background text-foreground shadow-xs transition-all duration-200',
         isGrayHover && 'hover:bg-secondary',
-        !isGrayHover && 'hover:border-[#ff9100] hover:bg-[#ff9100] hover:text-white',
+        !isGrayHover && 'hover:border-[#ff9100] hover:bg-[#ff9100] hover:text-white 123',
         item.active && 'border-[#ff9100] bg-[#ff9100] text-white'
       )}
     >

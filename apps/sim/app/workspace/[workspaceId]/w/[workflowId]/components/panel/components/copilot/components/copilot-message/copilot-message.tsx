@@ -631,7 +631,7 @@ const CopilotMessage: FC<CopilotMessageProps> = memo(
               <div
                 className='rounded-[10px] px-3 py-2'
                 style={{
-                  backgroundColor: '#ff9100',
+                  backgroundColor: '#ffb85a',
                 }}
               >
                 <div className='whitespace-pre-wrap break-words font-normal text-base text-foreground leading-relaxed'>
