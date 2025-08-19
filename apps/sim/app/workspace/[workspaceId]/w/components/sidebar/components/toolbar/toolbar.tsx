@@ -41,7 +41,6 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'ElevenLabs',
     'GitHub',
     'Linear',
-    'Airtable',
     'Hugging Face',
     'Jira',
     // 'Microsoft Excel',
@@ -59,7 +58,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Webhook',
     'Serper',
     'Memory',
-    'Parallel'
+    'Parallel',
   ]
 
   const { regularBlocks, specialBlocks, tools, triggers } = useMemo(() => {

@@ -163,7 +163,7 @@ export function SocialLoginButtons({
   }
 
   return (
-    <div className='grid gap-3'>
+    <div className='grid gap-3 hidden'>
       {renderGoogleButton()}
     </div>
   )

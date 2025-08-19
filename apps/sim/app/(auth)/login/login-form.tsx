@@ -366,7 +366,7 @@ export default function LoginPage({
             callbackURL={callbackUrl}
           />
 
-          <div className='relative mt-2 py-4'>
+          <div className='relative mt-2 py-4 hidden'>
             <div className='absolute inset-0 flex items-center'>
               <div className='w-full border-neutral-700/50 border-t' />
             </div>
