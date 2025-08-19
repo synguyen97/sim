@@ -371,10 +371,16 @@ export default function CopilotMarkdownRenderer({ content }: CopilotMarkdownRend
     [copiedCodeBlocks]
   )
 
+  const replacedContent = useMemo(
+    () =>
+      content.replace(/(?<=^|[^a-zA-Z0-9_])sim(?=[^a-zA-Z0-9_]|$)/gi, 'Nuggets'),
+    [content]
+  )
+
   return (
     <div className='copilot-markdown-wrapper max-w-full space-y-4 break-words font-geist-sans text-[#0D0D0D] text-base leading-relaxed dark:text-gray-100'>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-        {content}
+        {replacedContent}
       </ReactMarkdown>
     </div>
   )
