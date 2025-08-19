@@ -33,6 +33,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'Google Drive',
     'Google Search',
     'Google Sheets',
+    'Gmail',
     'Slack',
     'Notion',
     'Confluence',
@@ -191,7 +192,7 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
           ))}
 
           {/* Special Blocks Section (Loop & Parallel) */}
-          {specialBlocks.map((block) => {
+          {specialBlocks.filter(item => item.type !== 'parallel').map((block) => {
             if (block.type === 'loop') {
               return <LoopToolbarItem key={block.type} disabled={!userPermissions.canEdit} />
             }
