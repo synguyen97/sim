@@ -833,7 +833,7 @@ export function SearchModal({
                         Pages
                       </h3>
                       <div className='space-y-1 px-6'>
-                        {filteredPages.map((page, pageIndex) => {
+                        {filteredPages.filter(item => item.name == 'Logs' || item.name == 'Templates').map((page, pageIndex) => {
                           const globalIndex =
                             filteredWorkspaces.length + filteredWorkflows.length + pageIndex
                           return (
@@ -853,7 +853,7 @@ export function SearchModal({
                               <span className='flex-1 text-left font-normal font-sans text-muted-foreground text-sm leading-none tracking-normal'>
                                 {page.name}
                               </span>
-                              {page.shortcut && <KeyboardShortcut shortcut={page.shortcut} />}
+                              {/* {page.shortcut && <KeyboardShortcut shortcut={page.shortcut} />} */}
                             </button>
                           )
                         })}
