@@ -159,7 +159,6 @@ Create a system prompt appropriately detailed for the request, using clear langu
         const ollamaModels = useOllamaStore.getState().models
         const baseModels = Object.keys(getBaseModelProviders())
         const allModels = [...baseModels, ...ollamaModels]
-
         return allModels.map((model) => {
           const icon = getProviderIcon(model)
           return { label: model, id: model, ...(icon && { icon }) }
@@ -220,17 +219,33 @@ Create a system prompt appropriately detailed for the request, using clear langu
       connectionDroppable: false,
       required: true,
       // Hide API key for hosted models and Ollama models
-      condition: isHosted
-        ? {
-            field: 'model',
-            value: getHostedModels(),
-            not: true, // Show for all models EXCEPT those listed
-          }
-        : () => ({
-            field: 'model',
-            value: getCurrentOllamaModels(),
-            not: true, // Show for all models EXCEPT Ollama models
-          }),
+      condition: {
+        field: 'model',
+        value: [
+          ...providers['anthropic'].models,
+          ...providers['google'].models,
+          ...providers['xai'].models,
+          ...providers['deepseek'].models,
+          ...providers['azure-openai'].models,
+          ...providers['cerebras'].models,
+          ...providers['groq'].models,
+          ...providers['ollama'].models,
+        ],
+      }
+    },
+    {
+      id: 'apiKey',
+      title: 'API Key',
+      type: 'short-input',
+      layout: 'full',
+      placeholder: 'Enter your OpenAI API key',
+      password: true,
+      connectionDroppable: false,
+      required: true,
+      condition: {
+        field: 'model',
+        value: providers['openai'].models,
+      },
     },
     {
       id: 'azureEndpoint',

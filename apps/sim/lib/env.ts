@@ -133,6 +133,7 @@ export const env = createEnv({
     PORT:                                 z.number().optional(),                  // Main application port
     ALLOWED_ORIGINS:                      z.string().optional(),                  // CORS allowed origins
 
+    GOOGLE_SEARCH_API_KEY:                z.string().optional(),                  // Google Search API key
     // OAuth Integration Credentials - All optional, enables third-party integrations
     GOOGLE_CLIENT_ID:                     z.string().optional(),                  // Google OAuth client ID for Google services
     GOOGLE_CLIENT_SECRET:                 z.string().optional(),                  // Google OAuth client secret

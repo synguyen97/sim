@@ -192,7 +192,7 @@ export function CreateChunkModal({
                 <Button
                   onClick={handleCreateChunk}
                   disabled={!isFormValid || isCreating}
-                  className='bg-[#ff9100] font-[480] text-primary-foreground shadow-[0_0_0_0_#ff9100] transition-all duration-200 hover:bg-[#6518E6] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
+                  className='bg-[#ff9100] font-[480] text-primary-foreground shadow-[0_0_0_0_#ff9100] transition-all duration-200 hover:bg-[#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
                 >
                   {isCreating ? (
                     <>

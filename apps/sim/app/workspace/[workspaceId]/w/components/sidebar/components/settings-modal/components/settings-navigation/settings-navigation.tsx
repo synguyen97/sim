@@ -117,7 +117,7 @@ export function SettingsNavigation({
       return false
     }
 
-    if (item.id === 'subscription') {
+    if (item.id === 'subscription' || item.id === 'apikeys') {
       return false
     }
 

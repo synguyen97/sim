@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { checkTagTrigger, TagDropdown } from '@/components/ui/tag-dropdown'
 import { createLogger } from '@/lib/logs/console/logger'
 import { cn } from '@/lib/utils'
+import { env } from '@/lib/env'
 import { useSubBlockValue } from '@/app/workspace/[workspaceId]/w/[workflowId]/components/workflow-block/components/sub-block/hooks/use-sub-block-value'
 import type { SubBlockConfig } from '@/blocks/types'
 import { useTagSelection } from '@/hooks/use-tag-selection'
@@ -94,6 +95,26 @@ export function ShortInput({
         normalizedTitle.includes(pattern)
     )
   }, [config?.id, config?.title])
+
+  // Get default API key value based on field type
+  const getDefaultApiKeyValue = useMemo(() => {
+    if (!isApiKeyField || (value && value.toString().trim())) {
+      return null // Return null if not API key field or already has value
+    }
+
+    const placeholderText = placeholder?.toLowerCase() || ''
+    if (placeholderText.includes('enter your google api key')) {
+      return env.GOOGLE_SEARCH_API_KEY || null
+    }
+
+    if (placeholderText.includes('enter your serper api key')) {
+      return env.SERPER_API_KEY || null
+    }
+
+    if (placeholderText.includes('enter your openai api key')) {
+      return env.OPENAI_API_KEY || null
+    }
+  }, [])
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -277,9 +298,50 @@ export function ShortInput({
     }
   }
 
-  // Value display logic
-  const displayValue =
-    password && !isFocused ? '•'.repeat(value?.toString().length ?? 0) : (value?.toString() ?? '')
+  // Value display logic with API key fallback
+  const getDisplayValue = useMemo(() => {
+    const currentValue = value?.toString() ?? ''
+    
+    // If no value and this is an API key field, show the default env value
+    if (!currentValue && getDefaultApiKeyValue) {
+      return getDefaultApiKeyValue
+    }
+    
+    return currentValue
+  }, [value, getDefaultApiKeyValue])
+
+  const displayValue = password && !isFocused 
+    ? '•'.repeat(getDisplayValue.length ?? 0) 
+    : getDisplayValue
+
+  // Handle focus with API key default value
+  const handleFocus = () => {
+    setIsFocused(true)
+
+    // If this is an API key field, automatically show env vars dropdown
+    if (isApiKeyField) {
+      setShowEnvVars(true)
+      setSearchTerm('')
+
+      // If no current value but has default, set the default value
+      if (!value?.toString().trim() && getDefaultApiKeyValue) {
+        const defaultValue = getDefaultApiKeyValue
+        if (onChange) {
+          onChange(defaultValue)
+        } else if (!isPreview) {
+          setStoreValue(defaultValue)
+        }
+      }
+
+      // Set cursor position to the end of the input
+      const inputLength = getDisplayValue.length ?? 0
+      setCursorPosition(inputLength)
+    } else {
+      setShowEnvVars(false)
+      setShowTags(false)
+      setSearchTerm('')
+    }
+  }
 
   // Explicitly mark environment variable references with '{{' and '}}' when inserting
   const handleEnvVarSelect = (newValue: string) => {
@@ -309,23 +371,7 @@ export function ShortInput({
         type='text'
         value={displayValue}
         onChange={handleChange}
-        onFocus={() => {
-          setIsFocused(true)
-
-          // If this is an API key field, automatically show env vars dropdown
-          if (isApiKeyField) {
-            setShowEnvVars(true)
-            setSearchTerm('')
-
-            // Set cursor position to the end of the input
-            const inputLength = value?.toString().length ?? 0
-            setCursorPosition(inputLength)
-          } else {
-            setShowEnvVars(false)
-            setShowTags(false)
-            setSearchTerm('')
-          }
-        }}
+        onFocus={handleFocus}
         onBlur={() => {
           setIsFocused(false)
           setShowEnvVars(false)
@@ -350,8 +396,8 @@ export function ShortInput({
           style={{ scrollbarWidth: 'none', minWidth: 'fit-content' }}
         >
           {password && !isFocused
-            ? '•'.repeat(value?.toString().length ?? 0)
-            : formatDisplayText(value?.toString() ?? '', true)}
+            ? '•'.repeat(getDisplayValue.length ?? 0)
+            : formatDisplayText(getDisplayValue, true)}
         </div>
       </div>
 
@@ -359,7 +405,7 @@ export function ShortInput({
         visible={showEnvVars}
         onSelect={handleEnvVarSelect}
         searchTerm={searchTerm}
-        inputValue={value?.toString() ?? ''}
+        inputValue={getDisplayValue}
         cursorPosition={cursorPosition}
         onClose={() => {
           setShowEnvVars(false)
@@ -371,7 +417,7 @@ export function ShortInput({
         onSelect={handleEnvVarSelect}
         blockId={blockId}
         activeSourceBlockId={activeSourceBlockId}
-        inputValue={value?.toString() ?? ''}
+        inputValue={getDisplayValue}
         cursorPosition={cursorPosition}
         onClose={() => {
           setShowTags(false)

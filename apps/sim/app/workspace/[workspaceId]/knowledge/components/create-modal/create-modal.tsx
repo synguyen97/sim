@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, X } from 'lucide-react'
+import { AlertCircle, ChevronDown, X } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -84,6 +85,7 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
   const [fileError, setFileError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragCounter, setDragCounter] = useState(0) // Track drag events to handle nested elements
+  const [isChunkingConfigOpen, setIsChunkingConfigOpen] = useState(false)
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const dropZoneRef = useRef<HTMLDivElement>(null)
@@ -404,73 +406,92 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                     )}
                   </div>
 
-                  {/* Chunk Configuration Section */}
-                  <div className='space-y-4 rounded-lg border p-4'>
-                    <h3 className='font-medium text-foreground text-sm'>Chunking Configuration</h3>
-
-                    {/* Min and Max Chunk Size Row */}
-                    <div className='grid grid-cols-2 gap-4'>
-                      <div className='space-y-2'>
-                        <Label htmlFor='minChunkSize'>Min Chunk Size</Label>
-                        <Input
-                          id='minChunkSize'
-                          type='number'
-                          placeholder='1'
-                          {...register('minChunkSize', { valueAsNumber: true })}
-                          className={errors.minChunkSize ? 'border-red-500' : ''}
-                          autoComplete='off'
-                          data-form-type='other'
-                          name='min-chunk-size'
+                  {/* Chunking Configuration Accordion */}
+                  <Collapsible open={isChunkingConfigOpen} onOpenChange={setIsChunkingConfigOpen}>
+                    <CollapsibleTrigger asChild>
+                      <div className='flex w-full cursor-pointer items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50'>
+                        <div className='flex items-center gap-2'>
+                          <h3 className='font-medium text-foreground text-sm'>
+                            Advanced Chunking Configuration
+                          </h3>
+                          <span className='rounded-md bg-muted px-2 py-0.5 text-muted-foreground text-xs'>
+                            Optional
+                          </span>
+                        </div>
+                        <ChevronDown
+                          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+                            isChunkingConfigOpen ? 'rotate-180' : ''
+                          }`}
                         />
-                        {errors.minChunkSize && (
-                          <p className='mt-1 text-red-500 text-xs'>{errors.minChunkSize.message}</p>
-                        )}
                       </div>
+                    </CollapsibleTrigger>
 
-                      <div className='space-y-2'>
-                        <Label htmlFor='maxChunkSize'>Max Chunk Size</Label>
-                        <Input
-                          id='maxChunkSize'
-                          type='number'
-                          placeholder='1024'
-                          {...register('maxChunkSize', { valueAsNumber: true })}
-                          className={errors.maxChunkSize ? 'border-red-500' : ''}
-                          autoComplete='off'
-                          data-form-type='other'
-                          name='max-chunk-size'
-                        />
-                        {errors.maxChunkSize && (
-                          <p className='mt-1 text-red-500 text-xs'>{errors.maxChunkSize.message}</p>
-                        )}
+                    <CollapsibleContent className='mt-2'>
+                      <div className='space-y-4 rounded-lg border border-dashed bg-muted/20 p-4'>
+                        <p className='text-muted-foreground text-xs'>
+                          Configure how documents are split into chunks for processing. Default settings work well for most use cases. Smaller chunks provide more precise retrieval but may lose context.
+                        </p>
+
+                        {/* Min and Max Chunk Size Row */}
+                        <div className='grid grid-cols-2 gap-4'>
+                          <div className='space-y-2'>
+                            <Label htmlFor='minChunkSize'>Min Chunk Size</Label>
+                            <Input
+                              id='minChunkSize'
+                              type='number'
+                              placeholder='1'
+                              {...register('minChunkSize', { valueAsNumber: true })}
+                              className={errors.minChunkSize ? 'border-red-500' : ''}
+                              autoComplete='off'
+                              data-form-type='other'
+                              name='min-chunk-size'
+                            />
+                            {errors.minChunkSize && (
+                              <p className='mt-1 text-red-500 text-xs'>{errors.minChunkSize.message}</p>
+                            )}
+                          </div>
+
+                          <div className='space-y-2'>
+                            <Label htmlFor='maxChunkSize'>Max Chunk Size</Label>
+                            <Input
+                              id='maxChunkSize'
+                              type='number'
+                              placeholder='1024'
+                              {...register('maxChunkSize', { valueAsNumber: true })}
+                              className={errors.maxChunkSize ? 'border-red-500' : ''}
+                              autoComplete='off'
+                              data-form-type='other'
+                              name='max-chunk-size'
+                            />
+                            {errors.maxChunkSize && (
+                              <p className='mt-1 text-red-500 text-xs'>{errors.maxChunkSize.message}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Overlap Size */}
+                        <div className='space-y-2'>
+                          <Label htmlFor='overlapSize'>Overlap Size</Label>
+                          <Input
+                            id='overlapSize'
+                            type='number'
+                            placeholder='200'
+                            {...register('overlapSize', { valueAsNumber: true })}
+                            className={errors.overlapSize ? 'border-red-500' : ''}
+                            autoComplete='off'
+                            data-form-type='other'
+                            name='overlap-size'
+                          />
+                          {errors.overlapSize && (
+                            <p className='mt-1 text-red-500 text-xs'>{errors.overlapSize.message}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Overlap Size */}
-                    <div className='space-y-2'>
-                      <Label htmlFor='overlapSize'>Overlap Size</Label>
-                      <Input
-                        id='overlapSize'
-                        type='number'
-                        placeholder='200'
-                        {...register('overlapSize', { valueAsNumber: true })}
-                        className={errors.overlapSize ? 'border-red-500' : ''}
-                        autoComplete='off'
-                        data-form-type='other'
-                        name='overlap-size'
-                      />
-                      {errors.overlapSize && (
-                        <p className='mt-1 text-red-500 text-xs'>{errors.overlapSize.message}</p>
-                      )}
-                    </div>
-
-                    <p className='text-muted-foreground text-xs'>
-                      Configure how documents are split into chunks for processing. Smaller chunks
-                      provide more precise retrieval but may lose context.
-                    </p>
-                  </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
 
-                {/* File Upload Section - Expands to fill remaining space */}
+                {/* File Upload Section - Rest remains the same */}
                 <div className='mt-6 flex flex-1 flex-col'>
                   <Label className='mb-2'>Upload Documents</Label>
                   <div className='flex flex-1 flex-col'>
@@ -595,7 +616,7 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
               </div>
             </div>
 
-            {/* Footer */}
+            {/* Footer - remains the same */}
             <div className='mt-auto border-t px-6 pt-4 pb-6'>
               <div className='flex justify-between'>
                 <Button variant='outline' onClick={() => onOpenChange(false)} type='button'>
@@ -604,7 +625,7 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                 <Button
                   type='submit'
                   disabled={isSubmitting}
-                  className='bg-[#ff9100] font-[480] text-primary-foreground shadow-[0_0_0_0_#ff9100] transition-all duration-200 hover:bg-[#6518E6] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
+                  className='bg-[#ff9100] font-[480] text-primary-foreground shadow-[0_0_0_0_#ff9100] transition-all duration-200 hover:bg-[#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
                 >
                   {isSubmitting ? 'Creating...' : 'Create Knowledge Base'}
                 </Button>

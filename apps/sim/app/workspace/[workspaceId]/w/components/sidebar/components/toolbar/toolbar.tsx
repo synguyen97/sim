@@ -9,6 +9,7 @@ import LoopToolbarItem from '@/app/workspace/[workspaceId]/w/components/sidebar/
 import ParallelToolbarItem from '@/app/workspace/[workspaceId]/w/components/sidebar/components/toolbar/components/toolbar-parallel-block/toolbar-parallel-block'
 import { getAllBlocks } from '@/blocks'
 import type { WorkspaceUserPermissions } from '@/hooks/use-user-permissions'
+import { Hr } from '@react-email/components'
 
 interface ToolbarProps {
   userPermissions: WorkspaceUserPermissions
@@ -57,7 +58,10 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
     'X',
     'Youtube',
     'Schedule',
-    'Webhook'
+    'Webhook',
+    'Serper',
+    'Memory',
+    'Parallel'
   ]
 
   const { regularBlocks, specialBlocks, tools, triggers } = useMemo(() => {
@@ -206,6 +210,8 @@ export function Toolbar({ userPermissions, isWorkspaceSelectorVisible = false }:
             />
           ))}
 
+          <Hr></Hr>
+          <div className='text-xs text-muted-foreground'>Tools</div>
           {/* Tools Section */}
           {tools.map((tool) => (
             <ToolbarBlock key={tool.type} config={tool} disabled={!userPermissions.canEdit} />

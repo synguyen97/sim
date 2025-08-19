@@ -412,7 +412,7 @@ export function TemplateCard({
                 onClick={handleUseClick}
                 className={cn(
                   'rounded-[8px] px-3 py-1 font-medium font-sans text-white text-xs transition-[background-color,box-shadow] duration-200',
-                  'bg-[#ff9100] hover:bg-[#6518E6]',
+                  'bg-[#ff9100] hover:bg-[#ff9100]',
                   'shadow-[0_0_0_0_#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
                 )}
               >
@@ -430,7 +430,7 @@ export function TemplateCard({
         {/* Bottom section */}
         <div className='flex min-w-0 items-center gap-1.5 pt-1.5 font-sans text-muted-foreground text-xs'>
           <span className='flex-shrink-0'>by</span>
-          <span className='min-w-0 truncate'>{author}</span>
+          <span className='min-w-0 truncate'>Nuggets Team</span>
           <span className='flex-shrink-0'>•</span>
           <User className='h-3 w-3 flex-shrink-0' />
           <span className='flex-shrink-0'>{usageCount}</span>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDownToLine, CircleSlash, History, Plus, X } from 'lucide-react'
 import {
   DropdownMenu,
@@ -228,6 +228,10 @@ export function Panel() {
     togglePanel()
   }
 
+  useEffect(() => {
+    setActiveTab('copilot')
+  }, [])
+
   // Resize functionality
   const handleResizeStart = useCallback(
     (e: React.MouseEvent) => {
@@ -288,14 +292,14 @@ export function Panel() {
     <>
       {/* Tab Selector - Always visible */}
       <div className='fixed top-[76px] right-4 z-20 flex h-9 w-[308px] items-center gap-1 rounded-[14px] border bg-card px-[2.5px] py-1 shadow-xs'>
-        <button
+        {/* <button
           onClick={() => handleTabClick('chat')}
           className={`panel-tab-base inline-flex flex-1 cursor-pointer items-center justify-center rounded-[10px] border border-transparent py-1 font-[450] text-sm outline-none transition-colors duration-200 ${
             isOpen && activeTab === 'chat' ? 'panel-tab-active' : 'panel-tab-inactive'
           }`}
         >
           Chat
-        </button>
+        </button> */}
         <button
           onClick={() => handleTabClick('console')}
           className={`panel-tab-base inline-flex flex-1 cursor-pointer items-center justify-center rounded-[10px] border border-transparent py-1 font-[450] text-sm outline-none transition-colors duration-200 ${
@@ -312,14 +316,14 @@ export function Panel() {
         >
           Copilot
         </button>
-        <button
+        {/* <button
           onClick={() => handleTabClick('variables')}
           className={`panel-tab-base inline-flex flex-1 cursor-pointer items-center justify-center rounded-[10px] border border-transparent py-1 font-[450] text-sm outline-none transition-colors duration-200 ${
             isOpen && activeTab === 'variables' ? 'panel-tab-active' : 'panel-tab-inactive'
           }`}
         >
           Variables
-        </button>
+        </button> */}
       </div>
 
       {/* Panel Content - Only visible when isOpen is true */}

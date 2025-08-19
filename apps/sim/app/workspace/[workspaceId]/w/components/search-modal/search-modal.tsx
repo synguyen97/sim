@@ -863,7 +863,7 @@ export function SearchModal({
 
                   {/* Docs */}
                   {filteredDocs.length > 0 && (
-                    <div>
+                    <div className='hidden'>
                       <h3 className='mb-3 ml-6 font-normal font-sans text-muted-foreground text-sm leading-none tracking-normal'>
                         Docs
                       </h3>

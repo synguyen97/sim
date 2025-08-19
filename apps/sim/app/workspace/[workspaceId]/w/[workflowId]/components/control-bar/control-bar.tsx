@@ -643,7 +643,7 @@ export function ControlBar({ hasValidationErrors = false }: ControlBarProps) {
 
     const debugButtonClass = cn(
       'h-12 w-12 rounded-[11px] font-medium',
-      'bg-[#ff9100] hover:bg-[#6518E6]',
+      'bg-[#ff9100] hover:bg-[#ff9100]',
       'shadow-[0_0_0_0_#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
       'text-white transition-all duration-200',
       'disabled:opacity-50 disabled:hover:bg-[#ff9100] disabled:hover:shadow-none'
@@ -870,7 +870,7 @@ export function ControlBar({ hasValidationErrors = false }: ControlBarProps) {
           <Button
             className={cn(
               'gap-2 font-medium',
-              'bg-[#ff9100] hover:bg-[#6518E6]',
+              'bg-[#ff9100] hover:bg-[#ff9100]',
               'shadow-[0_0_0_0_#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
               'text-white transition-all duration-200',
               'disabled:opacity-50 disabled:hover:bg-[#ff9100] disabled:hover:shadow-none',
@@ -1001,14 +1001,13 @@ export function ControlBar({ hasValidationErrors = false }: ControlBarProps) {
     <div className='fixed top-4 right-4 z-20 flex items-center gap-1'>
       {renderDisconnectionNotice()}
       {renderToggleButton()}
-      {isExpanded && <ExportControls />}
       {isExpanded && renderAutoLayoutButton()}
       {!isDev && isExpanded && renderDuplicateButton()}
       {isDev && renderDuplicateButton()}
       {renderDeleteButton()}
       {!isDebugging && renderDebugModeToggle()}
       {isExpanded && renderPublishButton()}
-      {renderDeployButton()}
+      {/* {renderDeployButton()} */}
       {isDebugging ? renderDebugControlsBar() : renderRunButton()}
 
       {/* Template Modal */}

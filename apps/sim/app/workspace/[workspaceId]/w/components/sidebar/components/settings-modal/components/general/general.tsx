@@ -161,7 +161,7 @@ export function General() {
                 />
               </div>
 
-              <div className='flex items-center justify-between py-1'>
+              <div className='flex items-center justify-between py-1 !hidden'>
                 <div className='flex items-center gap-2'>
                   <Label htmlFor='console-expanded-by-default' className='font-medium'>
                     Console expanded by default

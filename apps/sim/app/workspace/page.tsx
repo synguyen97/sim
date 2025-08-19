@@ -21,8 +21,6 @@ export default function WorkspacePage() {
 
       // If user is not authenticated, redirect to login
       if (!session?.user) {
-        logger.info('User not authenticated, redirecting to login')
-        router.replace('/login')
         return
       }
 
