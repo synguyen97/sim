@@ -79,7 +79,7 @@ const WorkflowContent = React.memo(() => {
   // Hooks
   const params = useParams()
   const router = useRouter()
-  const { project, getNodes, fitView } = useReactFlow()
+  const { project, getNodes, zoomIn, zoomOut } = useReactFlow()
 
   // Get workspace ID from the params
   const workspaceId = params.workspaceId as string
@@ -144,6 +144,23 @@ const WorkflowContent = React.memo(() => {
     // Otherwise, just use the edges as-is
     return edges
   }, [edges, isShowingDiff, isDiffReady, diffAnalysis, blocks])
+
+  useEffect(() => {
+    const handleZoomHotkey = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && (event.key === '=' || event.key === '+')) {
+        event.preventDefault()
+        zoomIn?.()
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === '-') {
+        event.preventDefault()
+        zoomOut?.()
+      }
+    }
+
+    window.addEventListener('keydown', handleZoomHotkey)
+    return () => window.removeEventListener('keydown', handleZoomHotkey)
+  }, [zoomIn, zoomOut])
+
 
   // User permissions - get current user's specific permissions from context
   const userPermissions = useUserPermissionsContext()
