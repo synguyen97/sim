@@ -9,6 +9,10 @@
   z-index: 0 !important;
 }
 
+.nextjs-toast {
+  display: none;
+}
+
 .workflow-container .react-flow__node {
   z-index: 21 !important;
 }
