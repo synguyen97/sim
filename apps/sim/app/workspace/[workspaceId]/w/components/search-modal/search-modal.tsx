@@ -245,17 +245,58 @@ export function SearchModal({
     return docsItems.sort((a, b) => a.name.localeCompare(b.name))
   }, [])
 
+  const priorityBlockNames = [
+    'Google Calendar',
+    'Google Docs', 
+    'Google Drive',
+    'Google Search',
+    'Google Sheets',
+    'Gmail',
+    'Slack',
+    'Notion',
+    'Confluence',
+    'Discord',
+    'ElevenLabs',
+    'GitHub',
+    'Linear',
+    'Hugging Face',
+    'Jira',
+    // 'Microsoft Excel',
+    // 'Microsoft Planner',
+    // 'Microsoft Teams',
+    'Reddit',
+    'Telegram',
+    'Twilio SMS',
+    'Typeform',
+    'WhatsApp',
+    'Wikipedia',
+    'X',
+    'Youtube',
+    'Schedule',
+    'Webhook',
+    'Memory',
+    'Parallel'
+  ]
+
   // Filter all items based on search query
   const filteredBlocks = useMemo(() => {
-    if (!searchQuery.trim()) return blocks
+    if (!searchQuery.trim()) {
+      return blocks.filter((block) => !priorityBlockNames.includes(block.name))
+    }
     const query = searchQuery.toLowerCase()
-    return blocks.filter((block) => block.name.toLowerCase().includes(query))
+    return blocks
+      .filter((block) => !priorityBlockNames.includes(block.name))
+      .filter((block) => block.name.toLowerCase().includes(query))
   }, [blocks, searchQuery])
 
   const filteredTools = useMemo(() => {
-    if (!searchQuery.trim()) return tools
+    if (!searchQuery.trim()) {
+      return tools.filter((tool) => priorityBlockNames.includes(tool.name))
+    }
     const query = searchQuery.toLowerCase()
-    return tools.filter((tool) => tool.name.toLowerCase().includes(query))
+    return tools
+      .filter((tool) => priorityBlockNames.includes(tool.name))
+      .filter((tool) => tool.name.toLowerCase().includes(query))
   }, [tools, searchQuery])
 
   const filteredTemplates = useMemo(() => {
@@ -612,7 +653,7 @@ export function SearchModal({
               {filteredBlocks.length > 0 && (
                 <div>
                   <h3 className='mb-3 ml-6 font-normal font-sans text-muted-foreground text-sm leading-none tracking-normal'>
-                    Blocks
+                    Nuggets
                   </h3>
                   <div
                     ref={(el) => {
