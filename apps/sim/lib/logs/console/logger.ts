@@ -169,18 +169,18 @@ export class Logger {
       const coloredPrefix = `${timestampColor(`[${timestamp}]`)} ${levelColor(`[${level}]`)} ${moduleColor(`[${this.module}]`)}`
 
       if (level === LogLevel.ERROR) {
-        console.error(coloredPrefix, message, ...formattedArgs)
+        // console.error(coloredPrefix, message, ...formattedArgs)
       } else {
-        console.log(coloredPrefix, message, ...formattedArgs)
+        // console.log(coloredPrefix, message, ...formattedArgs)
       }
     } else {
       // No colors in production
       const prefix = `[${timestamp}] [${level}] [${this.module}]`
 
       if (level === LogLevel.ERROR) {
-        console.error(prefix, message, ...formattedArgs)
+        // console.error(prefix, message, ...formattedArgs)
       } else {
-        console.log(prefix, message, ...formattedArgs)
+        // console.log(prefix, message, ...formattedArgs)
       }
     }
   }

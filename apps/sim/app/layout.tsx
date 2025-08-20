@@ -8,6 +8,8 @@ import { env } from '@/lib/env'
 import { isHosted } from '@/lib/environment'
 import { createLogger } from '@/lib/logs/console/logger'
 import { getAssetUrl } from '@/lib/utils'
+import { HideNextJsToast } from './HideNextJsToast'
+
 import '@/app/globals.css'
 
 import { ZoomPrevention } from '@/app/zoom-prevention'
@@ -106,6 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body suppressHydrationWarning>
         <BrandedLayout>
+          <HideNextJsToast />
           <ZoomPrevention />
           {children}
           {isHosted && (

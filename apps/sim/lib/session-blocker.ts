@@ -17,18 +17,15 @@ class SessionRequestBlocker {
     
     // Return cached response if still valid
     if (this.lastResponse && (now - this.lastFetchTime) < this.CACHE_DURATION) {
-      console.log('🔄 Returning cached session')
       return this.lastResponse
     }
 
     // If there's already a pending request, wait for it
     if (this.pendingRequest) {
-      console.log('⏳ Waiting for pending session request')
       return await this.pendingRequest
     }
 
     // Create new request
-    console.log('🆕 Creating new session request')
     this.pendingRequest = this.fetchSession()
     
     try {
