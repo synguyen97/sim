@@ -50,6 +50,7 @@ export function LongInput({
 }: LongInputProps) {
   // Local state for immediate UI updates during streaming
   const [localContent, setLocalContent] = useState<string>('')
+  const [isStreaming, setIsStreaming] = useState<boolean>(false)
 
   // Wand functionality (only if wandConfig is enabled) - define early to get streaming state
   const wandHook = config.wandConfig?.enabled
@@ -59,14 +60,17 @@ export function LongInput({
         onStreamStart: () => {
           // Clear the content when streaming starts
           setLocalContent('')
+          setIsStreaming(true)
         },
         onStreamChunk: (chunk) => {
           // Update local content with each chunk as it arrives
           setLocalContent((current) => current + chunk)
+          setIsStreaming(true)
         },
         onGeneratedContent: (content) => {
           // Final content update (fallback)
           setLocalContent(content)
+          setIsStreaming(false)
         },
       })
     : null
@@ -109,12 +113,12 @@ export function LongInput({
 
   // Update store value during streaming (but won't persist until streaming ends)
   useEffect(() => {
-    if (wandHook?.isStreaming && localContent !== '') {
+    if (isStreaming && localContent !== '') {
       if (!isPreview && !disabled) {
         setStoreValue(localContent)
       }
     }
-  }, [localContent, wandHook?.isStreaming, isPreview, disabled, setStoreValue])
+  }, [localContent, isStreaming, isPreview, disabled, setStoreValue])
 
   // Calculate initial height based on rows prop with reasonable defaults
   const getInitialHeight = () => {

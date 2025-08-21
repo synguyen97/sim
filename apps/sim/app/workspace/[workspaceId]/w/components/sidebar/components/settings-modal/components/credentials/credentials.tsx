@@ -379,7 +379,7 @@ export function Credentials({ onOpenChange }: CredentialsProps) {
             <div className='flex flex-col gap-6'>
               {/* Services list */}
               {Object.entries(filteredGroupedServices).map(([providerKey, providerServices]) => (
-                (providerKey !== 'microsoft' && providerKey !== 'airtable' &&
+                (providerKey !== 'microsoft' && providerKey !== 'airtable' && providerKey !== 'wealthbox' &&
                 <div key={providerKey} className='flex flex-col gap-2'>
                   <Label className='font-normal text-muted-foreground text-xs uppercase'>
                     {OAUTH_PROVIDERS[providerKey]?.name || 'Other Services'}

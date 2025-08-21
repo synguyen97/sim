@@ -983,13 +983,13 @@ export function Sidebar() {
       shortcut: getKeyboardShortcutText('L', true, true),
       active: pathname === `/workspace/${workspaceId}/logs`,
     },
-    // {
-    //   id: 'knowledge',
-    //   icon: LibraryBig,
-    //   href: `/workspace/${workspaceId}/knowledge`,
-    //   tooltip: 'Knowledge',
-    //   active: pathname === `/workspace/${workspaceId}/knowledge`,
-    // },
+    {
+      id: 'knowledge',
+      icon: LibraryBig,
+      href: `/workspace/${workspaceId}/knowledge`,
+      tooltip: 'Knowledge',
+      active: pathname === `/workspace/${workspaceId}/knowledge`,
+    },
     {
       id: 'templates',
       icon: Shapes,
