@@ -113,12 +113,16 @@ export function LongInput({
 
   // Update store value during streaming (but won't persist until streaming ends)
   useEffect(() => {
-    if (isStreaming && localContent !== '') {
+    if (wandHook?.isLoading && localContent !== '') {
       if (!isPreview && !disabled) {
         setStoreValue(localContent)
       }
     }
-  }, [localContent, isStreaming, isPreview, disabled, setStoreValue])
+  }, [localContent, wandHook?.isLoading, isPreview, disabled, setStoreValue])
+
+  useEffect(() => {
+    console.log(wandHook);
+  }, [wandHook])
 
   // Calculate initial height based on rows prop with reasonable defaults
   const getInitialHeight = () => {
