@@ -112,7 +112,6 @@ export function LongInput({
 
   // Update store value during streaming (but won't persist until streaming ends)
   useEffect(() => {
-    console.log('Wand streaming state changed:', isStreaming, localContent)
     if (isStreaming && localContent !== '') {
       if (!isPreview && !disabled) {
         setStoreValue(localContent)
@@ -127,7 +126,6 @@ export function LongInput({
     } else {
       setIsStreaming(false)
     }
-    console.log('Wand prompt visibility changed:', wandHook?.isPromptVisible)
   }, [wandHook?.isPromptVisible])
 
   // Calculate initial height based on rows prop with reasonable defaults
