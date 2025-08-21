@@ -70,7 +70,6 @@ export function LongInput({
         onGeneratedContent: (content) => {
           // Final content update (fallback)
           setLocalContent(content)
-          setIsStreaming(false)
         },
       })
     : null
