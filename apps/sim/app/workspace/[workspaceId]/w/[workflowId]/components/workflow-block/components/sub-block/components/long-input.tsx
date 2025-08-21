@@ -116,6 +116,7 @@ export function LongInput({
     if (isStreaming && localContent !== '') {
       if (!isPreview && !disabled) {
         setStoreValue(localContent)
+        setIsStreaming(false)
       }
     }
   }, [localContent, wandHook?.isPromptVisible, isPreview, disabled, setStoreValue])
