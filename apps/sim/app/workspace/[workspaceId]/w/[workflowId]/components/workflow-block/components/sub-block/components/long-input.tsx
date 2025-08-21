@@ -119,7 +119,7 @@ export function LongInput({
         setStoreValue(localContent)
       }
     }
-  }, [localContent, wandHook?.isStreaming, isPreview, disabled, setStoreValue])
+  }, [localContent, wandHook?.isPromptVisible, isPreview, disabled, setStoreValue])
 
   useEffect(() => {
     if (wandHook?.isPromptVisible) {
