@@ -8,9 +8,8 @@ import { env } from '@/lib/env'
 import { isHosted } from '@/lib/environment'
 import { createLogger } from '@/lib/logs/console/logger'
 import { getAssetUrl } from '@/lib/utils'
-import { HideNextJsToast } from './HideNextJsToast'
-
 import '@/app/globals.css'
+import { HideNextJsToast } from './HideNextJsToast'
 
 import { ThemeProvider } from '@/app/theme-provider'
 import { ZoomPrevention } from '@/app/zoom-prevention'
@@ -85,15 +84,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property='og:image:height' content='630' />
         <meta
           property='og:image:alt'
-          content='Nuggets - AI Agent Builder with Visual Canvas Interface'
+          content='Sim - AI Agent Builder with Visual Canvas Interface'
         />
-        <meta property='og:site_name' content='Nuggets' />
+        <meta property='og:site_name' content='Sim' />
         <meta property='og:locale' content='en_US' />
 
         {/* Twitter Card tags */}
         <meta name='twitter:image:width' content='1200' />
         <meta name='twitter:image:height' content='675' />
-        <meta name='twitter:image:alt' content='Nuggets - AI Agent Builder' />
+        <meta name='twitter:image:alt' content='Sim - AI Agent Builder' />
+        <meta name='twitter:url' content='https://sim.ai' />
+        <meta name='twitter:domain' content='sim.ai' />
 
         {/* Additional image sources */}
         <link rel='image_src' href={getAssetUrl('social/facebook.png')} />
@@ -110,17 +111,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body suppressHydrationWarning>
-        <BrandedLayout>
-          <HideNextJsToast />
-          <ZoomPrevention />
-          {children}
-          {isHosted && (
-            <>
-              <SpeedInsights />
-              <Analytics />
-            </>
-          )}
-        </BrandedLayout>
+        <ThemeProvider>
+          <BrandedLayout>
+            <HideNextJsToast />
+            <ZoomPrevention />
+            {children}
+            {isHosted && (
+              <>
+                <SpeedInsights />
+                <Analytics />
+              </>
+            )}
+          </BrandedLayout>
+        </ThemeProvider>
       </body>
     </html>
   )
