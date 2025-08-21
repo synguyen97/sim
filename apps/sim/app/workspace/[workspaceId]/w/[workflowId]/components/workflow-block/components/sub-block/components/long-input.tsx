@@ -109,7 +109,7 @@ export function LongInput({
 
   // Update store value during streaming (but won't persist until streaming ends)
   useEffect(() => {
-    if (localContent !== '') {
+    if (wandHook?.isStreaming && localContent !== '') {
       if (!isPreview && !disabled) {
         setStoreValue(localContent)
       }
