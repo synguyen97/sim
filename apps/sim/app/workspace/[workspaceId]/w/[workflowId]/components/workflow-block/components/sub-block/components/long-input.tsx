@@ -113,16 +113,21 @@ export function LongInput({
 
   // Update store value during streaming (but won't persist until streaming ends)
   useEffect(() => {
-    if (wandHook?.isLoading && localContent !== '') {
+    if (wandHook?.isStreaming && localContent !== '') {
       if (!isPreview && !disabled) {
         setStoreValue(localContent)
       }
     }
-  }, [localContent, wandHook?.isLoading, isPreview, disabled, setStoreValue])
+  }, [localContent, wandHook?.isStreaming, isPreview, disabled, setStoreValue])
 
   useEffect(() => {
-    console.log(wandHook);
-  }, [wandHook])
+    if (wandHook?.isPromptVisible) {
+      setIsStreaming(true)
+    } else {
+      setIsStreaming(false)
+    }
+    console.log('Wand prompt visibility changed:', wandHook?.isPromptVisible)
+  }, [wandHook?.isPromptVisible])
 
   // Calculate initial height based on rows prop with reasonable defaults
   const getInitialHeight = () => {
