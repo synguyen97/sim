@@ -586,10 +586,10 @@ export function TemplateModal({ open, onOpenChange, workflowId }: TemplateModalP
                   disabled={isSubmitting || !isFormValid || isLoadingTemplate}
                   className={cn(
                     'font-medium',
-                    'bg-[#ff9100] hover:bg-[#ff9100]',
-                    'shadow-[0_0_0_0_#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
+                    'bg-[#21A29A] hover:bg-[#21A29A]',
+                    'shadow-[0_0_0_0_#21A29A] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
                     'text-white transition-all duration-200',
-                    'disabled:opacity-50 disabled:hover:bg-[#ff9100] disabled:hover:shadow-none',
+                    'disabled:opacity-50 disabled:hover:bg-[#21A29A] disabled:hover:shadow-none',
                     'h-10 rounded-md px-4 py-2'
                   )}
                 >

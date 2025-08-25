@@ -21,7 +21,7 @@
               rx={11.5}
               stroke="#333"
             />
-            <rect x={400} y={157} width={28} height={28} rx={8} fill="#c56200" />
+            <rect x={400} y={157} width={28} height={28} rx={8} fill="#65a8a4" />
             <g
               clipPath="url(#clip1_113_57)"
               stroke="#fff"

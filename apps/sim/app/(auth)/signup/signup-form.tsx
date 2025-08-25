@@ -490,7 +490,7 @@ function SignupFormContent({
 
             <Button
               type='submit'
-              className='flex h-11 w-full items-center justify-center gap-2 bg-[#ff9100] font-medium text-base text-white shadow-[#ff9100]/20 shadow-lg transition-colors duration-200 hover:bg-[#c56200]'
+              className='flex h-11 w-full items-center justify-center gap-2 bg-[#21A29A] font-medium text-base text-white shadow-[#21A29A]/20 shadow-lg transition-colors duration-200 hover:bg-[#65a8a4]'
               disabled={isLoading}
             >
               {isLoading ? 'Creating account...' : 'Create Account'}
@@ -502,7 +502,7 @@ function SignupFormContent({
           <span className='text-neutral-400'>Already have an account? </span>
           <Link
             href={isInviteFlow ? `/login?invite_flow=true&callbackUrl=${redirectUrl}` : '/login'}
-            className='font-medium text-[#ff9100] underline-offset-4 transition hover:text-[#ffd180] hover:underline'
+            className='font-medium text-[#21A29A] underline-offset-4 transition hover:text-[#65a8a4] hover:underline'
           >
             Sign in
           </Link>

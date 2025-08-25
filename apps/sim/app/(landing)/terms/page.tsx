@@ -268,7 +268,7 @@ export default function TermsOfService() {
                   Arbitration Agreement. The arbitration will be conducted by JAMS, an established
                   alternative dispute resolution provider.
                 </p>
-                <p className='mb-4 border-[#ff9100] border-l-4 bg-[#ff9100]/10 p-3'>
+                <p className='mb-4 border-[#21A29A] border-l-4 bg-[#21A29A]/10 p-3'>
                   YOU AND COMPANY AGREE THAT EACH OF US MAY BRING CLAIMS AGAINST THE OTHER ONLY ON
                   AN INDIVIDUAL BASIS AND NOT ON A CLASS, REPRESENTATIVE, OR COLLECTIVE BASIS. ONLY
                   INDIVIDUAL RELIEF IS AVAILABLE, AND DISPUTES OF MORE THAN ONE CUSTOMER OR USER
@@ -277,7 +277,7 @@ export default function TermsOfService() {
                 <p className='mb-4'>
                   You have the right to opt out of the provisions of this Arbitration Agreement by
                   sending a timely written notice of your decision to opt out to:{' '}
-                  <Link href='mailto:legal@sim.ai' className='text-[#B5A1D4] hover:text-[#ff9100]'>
+                  <Link href='mailto:legal@sim.ai' className='text-[#B5A1D4] hover:text-[#21A29A]'>
                     legal@sim.ai{' '}
                   </Link>
                   within 30 days after first becoming subject to this Arbitration Agreement.
@@ -330,7 +330,7 @@ export default function TermsOfService() {
                   Our Copyright Agent can be reached at:{' '}
                   <Link
                     href='mailto:copyright@sim.ai'
-                    className='text-[#B5A1D4] hover:text-[#ff9100]'
+                    className='text-[#B5A1D4] hover:text-[#21A29A]'
                   >
                     copyright@sim.ai
                   </Link>
@@ -341,7 +341,7 @@ export default function TermsOfService() {
                 <h2 className='mb-4 font-semibold text-2xl text-white'>12. Contact Us</h2>
                 <p>
                   If you have any questions about these Terms, please contact us at:{' '}
-                  <Link href='mailto:legal@sim.ai' className='text-[#B5A1D4] hover:text-[#ff9100]'>
+                  <Link href='mailto:legal@sim.ai' className='text-[#B5A1D4] hover:text-[#21A29A]'>
                     legal@sim.ai
                   </Link>
                 </p>

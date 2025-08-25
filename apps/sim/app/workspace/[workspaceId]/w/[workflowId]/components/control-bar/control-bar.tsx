@@ -851,10 +851,10 @@ export function ControlBar({ hasValidationErrors = false }: ControlBarProps) {
 
     const debugButtonClass = cn(
       'h-12 w-12 rounded-[11px] font-medium',
-      'bg-[#ff9100] hover:bg-[#ff9100]',
-      'shadow-[0_0_0_0_#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
+      'bg-[#21A29A] hover:bg-[#21A29A]',
+      'shadow-[0_0_0_0_#21A29A] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
       'text-white transition-all duration-200',
-      'disabled:opacity-50 disabled:hover:bg-[#ff9100] disabled:hover:shadow-none'
+      'disabled:opacity-50 disabled:hover:bg-[#21A29A] disabled:hover:shadow-none'
     )
 
     return (
@@ -1078,10 +1078,10 @@ export function ControlBar({ hasValidationErrors = false }: ControlBarProps) {
           <Button
             className={cn(
               'gap-2 font-medium',
-              'bg-[#ff9100] hover:bg-[#ff9100]',
-              'shadow-[0_0_0_0_#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
+              'bg-[#21A29A] hover:bg-[#21A29A]',
+              'shadow-[0_0_0_0_#21A29A] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]',
               'text-white transition-all duration-200',
-              'disabled:opacity-50 disabled:hover:bg-[#ff9100] disabled:hover:shadow-none',
+              'disabled:opacity-50 disabled:hover:bg-[#21A29A] disabled:hover:shadow-none',
               'h-12 rounded-[11px] px-4 py-2'
             )}
             onClick={handleRunClick}

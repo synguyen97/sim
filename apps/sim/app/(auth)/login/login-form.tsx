@@ -458,7 +458,7 @@ export default function LoginPage({
 
             <Button
               type='submit'
-              className='flex h-11 w-full items-center justify-center gap-2 bg-[#ff9100] font-medium text-base text-white shadow-[#ff9100]/20 shadow-lg transition-colors duration-200 hover:bg-[#c56200]'
+              className='flex h-11 w-full items-center justify-center gap-2 bg-[#21A29A] font-medium text-base text-white shadow-[#21A29A]/20 shadow-lg transition-colors duration-200 hover:bg-[#65a8a4]'
               disabled={isLoading}
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
@@ -470,7 +470,7 @@ export default function LoginPage({
           <span className='text-neutral-400'>Don't have an account? </span>
           <Link
             href={isInviteFlow ? `/signup?invite_flow=true&callbackUrl=${callbackUrl}` : '/signup'}
-            className='font-medium text-[#ff9100] underline-offset-4 transition hover:text-[#ffd180] hover:underline'
+            className='font-medium text-[#21A29A] underline-offset-4 transition hover:text-[#65a8a4] hover:underline'
           >
             Sign up
           </Link>
@@ -499,7 +499,7 @@ export default function LoginPage({
                 placeholder='Enter your email'
                 required
                 type='email'
-                className='border-neutral-700/80 bg-neutral-900 text-white placeholder:text-white/60 focus:border-[#c56200]/70 focus:ring-[#c56200]/20'
+                className='border-neutral-700/80 bg-neutral-900 text-white placeholder:text-white/60 focus:border-[#65a8a4]/70 focus:ring-[#65a8a4]/20'
               />
             </div>
             {resetStatus.type && (
@@ -514,7 +514,7 @@ export default function LoginPage({
             <Button
               type='button'
               onClick={handleForgotPassword}
-              className='h-11 w-full bg-[#ff9100] font-medium text-base text-white shadow-[#ff9100]/20 shadow-lg transition-colors duration-200 hover:bg-[#c56200]'
+              className='h-11 w-full bg-[#21A29A] font-medium text-base text-white shadow-[#21A29A]/20 shadow-lg transition-colors duration-200 hover:bg-[#65a8a4]'
               disabled={isSubmittingReset}
             >
               {isSubmittingReset ? 'Sending...' : 'Send Reset Link'}

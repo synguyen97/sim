@@ -412,8 +412,8 @@ export function TemplateCard({
                 onClick={handleUseClick}
                 className={cn(
                   'rounded-[8px] px-3 py-1 font-medium font-sans text-white text-xs transition-[background-color,box-shadow] duration-200',
-                  'bg-[#ff9100] hover:bg-[#ff9100]',
-                  'shadow-[0_0_0_0_#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
+                  'bg-[#21A29A] hover:bg-[#21A29A]',
+                  'shadow-[0_0_0_0_#21A29A] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
                 )}
               >
                 Use

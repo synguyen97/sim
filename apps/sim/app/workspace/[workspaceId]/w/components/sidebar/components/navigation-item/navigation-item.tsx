@@ -30,8 +30,8 @@ export const NavigationItem = ({ item }: NavigationItemProps) => {
         'h-[42px] w-[42px] rounded-[10px] border bg-background text-foreground shadow-xs transition-all duration-200',
         isGrayHover && 'hover:bg-secondary',
         !isGrayHover &&
-          'hover:border-[var(--brand-primary-hex)] hover:bg-[var(--brand-primary-hex)] hover:text-white',
-        item.active && 'border-[var(--brand-primary-hex)] bg-[var(--brand-primary-hex)] text-white'
+          'hover:border-[#65a8a4] hover:bg-[#65a8a4] hover:text-white',
+        item.active && 'border-[#65a8a4] bg-[#65a8a4] text-white'
       )}
     >
       <item.icon className='h-4 w-4' />

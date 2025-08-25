@@ -412,7 +412,7 @@ export function ParticlesVisualization({
         uniforms.u_green.value = 0.2
         uniforms.u_blue.value = 0.9
       } else if (isPlayingAudio) {
-        // AI speaking: brand purple (#ff9100)
+        // AI speaking: brand purple (#21A29A)
         uniforms.u_red.value = 0.44
         uniforms.u_green.value = 0.12
         uniforms.u_blue.value = 0.99

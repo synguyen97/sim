@@ -79,7 +79,7 @@ export function useChatDeployment() {
           title: formData.title.trim(),
           description: formData.description.trim(),
           customizations: {
-            primaryColor: '#c56200',
+            primaryColor: '#65a8a4',
             welcomeMessage: formData.welcomeMessage.trim(),
             ...(imageUrl && { imageUrl }),
           },

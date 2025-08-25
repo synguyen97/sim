@@ -791,7 +791,7 @@ export function WorkflowBlock({ id, data }: NodeProps<WorkflowBlockProps>) {
                     }}
                     className={cn(
                       'h-7 p-1 text-gray-500',
-                      displayAdvancedMode && 'text-[#ff9100]',
+                      displayAdvancedMode && 'text-[#21A29A]',
                       !userPermissions.canEdit &&
                         !currentWorkflow.isDiffMode &&
                         'cursor-not-allowed opacity-50'

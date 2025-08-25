@@ -54,7 +54,7 @@ const SkeletonControlBar = () => {
 
       {/* Run Button */}
       <Button
-        className='h-12 cursor-not-allowed gap-2 rounded-[11px] bg-[#ff9100] px-4 py-2 font-medium text-white shadow-[0_0_0_0_#ff9100] transition-all duration-200 hover:bg-[#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)] disabled:opacity-50 disabled:hover:bg-[#ff9100] disabled:hover:shadow-none'
+        className='h-12 cursor-not-allowed gap-2 rounded-[11px] bg-[#21A29A] px-4 py-2 font-medium text-white shadow-[0_0_0_0_#21A29A] transition-all duration-200 hover:bg-[#21A29A] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)] disabled:opacity-50 disabled:hover:bg-[#21A29A] disabled:hover:shadow-none'
         disabled
       >
         <Play className='h-3.5 w-3.5 fill-current stroke-current' />

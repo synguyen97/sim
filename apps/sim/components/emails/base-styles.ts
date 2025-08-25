@@ -31,7 +31,7 @@ export const baseStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: '#c56200',
+    backgroundColor: '#65a8a4',
     color: '#ffffff',
     fontWeight: 'bold',
     fontSize: '16px',
@@ -42,7 +42,7 @@ export const baseStyles = {
     margin: '20px 0',
   },
   link: {
-    color: '#c56200',
+    color: '#65a8a4',
     textDecoration: 'underline',
   },
   footer: {
@@ -79,7 +79,7 @@ export const baseStyles = {
     width: '249px',
   },
   sectionCenter: {
-    borderBottom: '1px solid #c56200',
+    borderBottom: '1px solid #65a8a4',
     width: '102px',
   },
 }

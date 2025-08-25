@@ -226,7 +226,7 @@ export const WEBHOOK_PROVIDERS: { [key: string]: WebhookProvider } = {
       <div
         className={`flex items-center justify-center rounded ${props.className || ''}`}
         style={{
-          backgroundColor: '#c56200',
+          backgroundColor: '#65a8a4',
           minWidth: '28px',
           padding: '0 4px',
         }}

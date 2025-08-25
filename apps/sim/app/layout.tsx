@@ -105,9 +105,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Twitter Card tags */}
         <meta name='twitter:image:width' content='1200' />
         <meta name='twitter:image:height' content='675' />
-        <meta name='twitter:image:alt' content='Sim - AI Agent Builder' />
-        <meta name='twitter:url' content='https://sim.ai' />
-        <meta name='twitter:domain' content='sim.ai' />
 
         {/* Additional image sources */}
         <link rel='image_src' href={getAssetUrl('social/facebook.png')} />

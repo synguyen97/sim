@@ -66,7 +66,7 @@ export function DocumentLoading({
                 <Button
                   disabled
                   size='sm'
-                  className='flex items-center gap-1 bg-[#ff9100] font-[480] text-primary-foreground shadow-[0_0_0_0_#ff9100] transition-all duration-200 hover:bg-[#ff9100] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)] disabled:opacity-50'
+                  className='flex items-center gap-1 bg-[#21A29A] font-[480] text-primary-foreground shadow-[0_0_0_0_#21A29A] transition-all duration-200 hover:bg-[#21A29A] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)] disabled:opacity-50'
                 >
                   <Plus className='h-3.5 w-3.5' />
                   <span>Create Chunk</span>

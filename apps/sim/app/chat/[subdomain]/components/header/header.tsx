@@ -16,7 +16,7 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ chatConfig, starCount }: ChatHeaderProps) {
-  const primaryColor = chatConfig?.customizations?.primaryColor || '#ff9100'
+  const primaryColor = chatConfig?.customizations?.primaryColor || '#21A29A'
   const customImage = chatConfig?.customizations?.imageUrl || chatConfig?.customizations?.logoUrl
 
   return (
