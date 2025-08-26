@@ -222,7 +222,7 @@ export default function NavClient({
                 />
               ) : (
                 <Image
-                  src="/nuggets-light-logo.png"
+                  src="/code-light-logo.png"
                   alt={`${brand.name} Logo`}
                   width={130}
                   height={42}

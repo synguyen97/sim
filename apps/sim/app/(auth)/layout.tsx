@@ -33,7 +33,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 className='h-[56px] w-[56px] object-contain'
               />
             ) : (
-              <Image src='/nuggets-light-logo.png' alt={`${brand.name} Logo`} width={130} height={42} />
+              <Image src='/code-light-logo.png' alt={`${brand.name} Logo`} width={130} height={42} />
             )}
           </Link>
         </div>
