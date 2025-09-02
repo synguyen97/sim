@@ -316,7 +316,7 @@ export function DiffControls() {
           variant='default'
           size='sm'
           onClick={handleAccept}
-          className='h-8 rounded-[6px] bg-[var(--brand-primary-hover-hex)] px-3 text-white hover:bg-[var(--brand-primary-hover-hex)]/90 hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
+          className='h-8 rounded-[6px] bg-[#c56200] px-3 text-white hover:bg-[#c56200]/90 hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
           title='Accept changes'
         >
           Accept

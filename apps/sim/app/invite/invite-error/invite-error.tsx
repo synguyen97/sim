@@ -92,7 +92,7 @@ export default function InviteError() {
             <Button
               variant='default'
               className='w-full'
-              style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+              style={{ backgroundColor: '#c56200', color: 'white' }}
               asChild
             >
               <Link href='/verify'>
@@ -117,7 +117,7 @@ export default function InviteError() {
 
           <Button
             className='w-full'
-            style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+            style={{ backgroundColor: '#c56200', color: 'white' }}
             asChild
           >
             <Link href='/'>Return to Home</Link>

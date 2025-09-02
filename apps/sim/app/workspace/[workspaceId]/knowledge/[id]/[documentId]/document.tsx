@@ -314,7 +314,7 @@ export function Document({
             onCheckedChange={(checked) => handleSelectChunk(chunk.id, checked as boolean)}
             disabled={!userPermissions.canEdit}
             aria-label={`Select chunk ${chunk.chunkIndex}`}
-            className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[var(--brand-primary-hex)]/20 data-[state=checked]:border-[var(--brand-primary-hex)] data-[state=checked]:bg-[var(--brand-primary-hex)] [&>*]:h-3 [&>*]:w-3'
+            className='h-3.5 w-3.5 border-gray-300 focus-visible:ring-[#c56200]/20 data-[state=checked]:border-[#c56200] data-[state=checked]:bg-[#c56200] [&>*]:h-3 [&>*]:w-3'
             onClick={(e) => e.stopPropagation()}
           />
         </td>

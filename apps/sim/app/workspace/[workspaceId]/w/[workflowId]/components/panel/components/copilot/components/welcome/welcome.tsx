@@ -59,7 +59,7 @@ export function CopilotWelcome({ onQuestionClick, mode = 'ask' }: CopilotWelcome
       <div className='relative mx-auto w-full max-w-xl'>
         {/* Header */}
         <div className='flex flex-col items-center text-center'>
-          <Bot className='h-12 w-12 text-[var(--brand-primary-hover-hex)]' strokeWidth={1.5} />
+          <Bot className='h-12 w-12 text-[#c56200]' strokeWidth={1.5} />
           <h3 className='mt-2 font-medium text-foreground text-lg sm:text-xl'>{subtitle}</h3>
         </div>
 
@@ -70,10 +70,10 @@ export function CopilotWelcome({ onQuestionClick, mode = 'ask' }: CopilotWelcome
               key={idx}
               type='button'
               onClick={() => handleQuestionClick(question)}
-              className='w-full rounded-[10px] border bg-background/60 p-3 text-left transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary-hover-hex)]/30'
+              className='w-full rounded-[10px] border bg-background/60 p-3 text-left transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-[#c56200]/30'
             >
               <div className='flex items-start gap-2'>
-                <div className='mt-0.5 flex h-6 w-6 items-center justify-center rounded bg-[color-mix(in_srgb,var(--brand-primary-hover-hex)_16%,transparent)] text-[var(--brand-primary-hover-hex)]'>
+                <div className='mt-0.5 flex h-6 w-6 items-center justify-center rounded bg-[color-mix(in_srgb,#c56200_16%,transparent)] text-[#c56200]'>
                   <Icon className='h-3.5 w-3.5' />
                 </div>
                 <div>

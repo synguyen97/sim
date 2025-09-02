@@ -588,7 +588,7 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                                 <div className='min-w-0 flex-1'>
                                   <div className='flex items-center gap-2'>
                                     {isCurrentlyUploading && (
-                                      <Loader2 className='h-4 w-4 animate-spin text-[var(--brand-primary-hex)]' />
+                                      <Loader2 className='h-4 w-4 animate-spin text-[#c56200]' />
                                     )}
                                     {isCompleted && <Check className='h-4 w-4 text-green-500' />}
                                     {isFailed && <X className='h-4 w-4 text-red-500' />}

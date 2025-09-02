@@ -1505,7 +1505,7 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
 
     const getDepthIconFor = (value: 0 | 1 | 2 | 3) => {
       const colorClass = !agentPrefetch
-        ? 'text-[var(--brand-primary-hover-hex)]'
+        ? 'text-[#c56200]'
         : 'text-muted-foreground'
       if (value === 0) return <Zap className={`h-3 w-3 ${colorClass}`} />
       if (value === 1) return <InfinityIcon className={`h-3 w-3 ${colorClass}`} />
@@ -1651,7 +1651,7 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
                     elements.push(
                       <span
                         key={`${mentionText}-${i}-${lastIndex}`}
-                        className='rounded-[6px] bg-[color-mix(in_srgb,var(--brand-primary-hover-hex)_14%,transparent)]'
+                        className='rounded-[6px] bg-[color-mix(in_srgb,#c56200_14%,transparent)]'
                       >
                         {mentionText}
                       </span>
@@ -2382,7 +2382,7 @@ const UserInput = forwardRef<UserInputRef, UserInputProps>(
                       className={cn(
                         'flex h-6 items-center gap-1.5 rounded-full border px-2 py-1 font-medium text-xs',
                         !agentPrefetch
-                          ? 'border-[var(--brand-primary-hover-hex)] text-[var(--brand-primary-hover-hex)] hover:bg-[color-mix(in_srgb,var(--brand-primary-hover-hex)_8%,transparent)] hover:text-[var(--brand-primary-hover-hex)]'
+                          ? 'border-[#c56200] text-[#c56200] hover:bg-[color-mix(in_srgb,#c56200_8%,transparent)] hover:text-[#c56200]'
                           : 'border-border text-foreground'
                       )}
                       title='Choose mode'

@@ -500,7 +500,7 @@ function SignupFormContent({
 
             <Button
               type='submit'
-              className='flex h-11 w-full items-center justify-center gap-2 bg-[#ff9100] font-medium text-base text-white shadow-[#ff9100]/20 shadow-lg transition-colors duration-200 hover:bg-[#c56200]'
+              className='flex h-11 w-full items-center justify-center gap-2 bg-[#c56200] font-medium text-base text-white shadow-[#c56200]/20 shadow-lg transition-colors duration-200 hover:bg-[#c56200]'
               disabled={isLoading}
             >
               {isLoading ? 'Creating account...' : 'Create Account'}
@@ -512,13 +512,13 @@ function SignupFormContent({
           <span className='text-neutral-400'>Already have an account? </span>
           <Link
             href={isInviteFlow ? `/login?invite_flow=true&callbackUrl=${redirectUrl}` : '/login'}
-            className='font-medium text-[#ff9100] underline-offset-4 transition hover:text-[#ffd180] hover:underline'
+            className='font-medium text-[#c56200] underline-offset-4 transition hover:text-[#c56200] hover:underline'
           >
             Sign in
           </Link>
         </div>
 
-        <div className='text-center text-neutral-500/80 text-xs leading-relaxed'>
+        {/* <div className='text-center text-neutral-500/80 text-xs leading-relaxed'>
           By creating an account, you agree to our{' '}
           <Link
             href='/terms'
@@ -533,7 +533,7 @@ function SignupFormContent({
           >
             Privacy Policy
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )

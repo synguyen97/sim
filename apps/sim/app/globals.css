@@ -96,8 +96,8 @@
     --gradient-secondary: 336 95% 65%; /* More vibrant pink */
 
     /* Brand Colors (Default Sim Theme) */
-    --brand-primary-hex: #701ffc; /* Primary brand purple */
-    --brand-primary-hover-hex: #802fff; /* Primary brand purple hover */
+    --brand-primary-hex: #ff9103; /* Primary brand purple */
+    --brand-primary-hover-hex: #ff9103; /* Primary brand purple hover */
     --brand-secondary-hex: #6518e6; /* Secondary brand purple */
     --brand-accent-hex: #9d54ff; /* Accent purple for links */
     --brand-accent-hover-hex: #a66fff; /* Accent purple hover */
@@ -364,11 +364,11 @@ input[type="search"]::-ms-clear {
 
   /* Brand Color Utilities */
   .bg-brand-primary {
-    background-color: var(--brand-primary-hex);
+    background-color: #c56200;
   }
 
   .bg-brand-primary-hover {
-    background-color: var(--brand-primary-hover-hex);
+    background-color: #c56200;
   }
 
   .bg-brand-secondary {
@@ -384,7 +384,7 @@ input[type="search"]::-ms-clear {
   }
 
   .text-brand-primary {
-    color: var(--brand-primary-hex);
+    color: #c56200;
   }
 
   .text-brand-accent {
@@ -396,11 +396,11 @@ input[type="search"]::-ms-clear {
   }
 
   .border-brand-primary {
-    border-color: var(--brand-primary-hex);
+    border-color: #c56200;
   }
 
   .hover\:bg-brand-primary-hover:hover {
-    background-color: var(--brand-primary-hover-hex);
+    background-color: #c56200;
   }
 
   .hover\:bg-brand-secondary:hover {

@@ -208,7 +208,7 @@ export default function Invite() {
               <>
                 <Button
                   className='w-full'
-                  style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+                  style={{ backgroundColor: '#c56200', color: 'white' }}
                   onClick={() => router.push(`/signup?callbackUrl=${callbackUrl}&invite_flow=true`)}
                 >
                   Create an account
@@ -225,7 +225,7 @@ export default function Invite() {
               <>
                 <Button
                   className='w-full'
-                  style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+                  style={{ backgroundColor: '#c56200', color: 'white' }}
                   onClick={() => router.push(`/login?callbackUrl=${callbackUrl}&invite_flow=true`)}
                 >
                   Sign in
@@ -244,7 +244,7 @@ export default function Invite() {
 
             <Button
               className='w-full'
-              style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+              style={{ backgroundColor: '#c56200', color: 'white' }}
               onClick={() => router.push('/')}
             >
               Return to Home
@@ -314,7 +314,7 @@ export default function Invite() {
 
           <Button
             className='w-full'
-            style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+            style={{ backgroundColor: '#c56200', color: 'white' }}
             onClick={() => router.push('/')}
           >
             Return to Home
@@ -357,7 +357,7 @@ export default function Invite() {
 
           <Button
             className='w-full'
-            style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+            style={{ backgroundColor: '#c56200', color: 'white' }}
             onClick={() => router.push('/')}
           >
             Return to Home
@@ -414,7 +414,7 @@ export default function Invite() {
             onClick={handleAcceptInvitation}
             disabled={isAccepting}
             className='w-full'
-            style={{ backgroundColor: 'var(--brand-primary-hex)', color: 'white' }}
+            style={{ backgroundColor: '#c56200', color: 'white' }}
           >
             {isAccepting ? (
               <>
