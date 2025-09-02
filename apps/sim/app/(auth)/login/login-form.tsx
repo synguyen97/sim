@@ -472,7 +472,7 @@ export default function LoginPage({
           </Link>
         </div>
 
-        <div className='text-center text-neutral-500/80 text-xs leading-relaxed'>
+        {/* <div className='text-center text-neutral-500/80 text-xs leading-relaxed'>
           By signing in, you agree to our{' '}
           <Link
             href='/terms'
@@ -487,7 +487,7 @@ export default function LoginPage({
           >
             Privacy Policy
           </Link>
-        </div>
+        </div> */}
       </div>
 
       <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>

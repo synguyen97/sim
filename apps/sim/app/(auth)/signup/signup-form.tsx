@@ -518,7 +518,7 @@ function SignupFormContent({
           </Link>
         </div>
 
-        <div className='text-center text-neutral-500/80 text-xs leading-relaxed'>
+        {/* <div className='text-center text-neutral-500/80 text-xs leading-relaxed'>
           By creating an account, you agree to our{' '}
           <Link
             href='/terms'
@@ -533,7 +533,7 @@ function SignupFormContent({
           >
             Privacy Policy
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )

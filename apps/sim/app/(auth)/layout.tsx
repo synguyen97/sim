@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Header */}
       <div className='relative z-10 px-6 pt-9'>
-        <div className='mx-auto max-w-7xl'>
+        <div className='mx-auto max-w-7xl text-center'>
           <Link href='/' className='inline-flex'>
             {brand.logoUrl ? (
               <img

@@ -368,7 +368,7 @@ input[type="search"]::-ms-clear {
   }
 
   .bg-brand-primary-hover {
-    background-color: var(--brand-primary-hover-hex);
+    background-color: #21A29A;
   }
 
   .bg-brand-secondary {
@@ -400,7 +400,7 @@ input[type="search"]::-ms-clear {
   }
 
   .hover\:bg-brand-primary-hover:hover {
-    background-color: var(--brand-primary-hover-hex);
+    background-color: #21A29A;
   }
 
   .hover\:bg-brand-secondary:hover {
