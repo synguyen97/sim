@@ -13,6 +13,7 @@ import { useSubBlockValue } from '@/app/workspace/[workspaceId]/w/[workflowId]/c
 import { useWand } from '@/app/workspace/[workspaceId]/w/[workflowId]/hooks/use-wand'
 import type { SubBlockConfig } from '@/blocks/types'
 import { useTagSelection } from '@/hooks/use-tag-selection'
+import { useOperationQueueStore } from '@/stores/operation-queue/store'
 
 const logger = createLogger('LongInput')
 
@@ -76,7 +77,6 @@ export function LongInput({
 
   // State management - useSubBlockValue with explicit streaming control
   const [storeValue, setStoreValue] = useSubBlockValue(blockId, subBlockId, false, {
-    debounceMs: 150,
     isStreaming: wandHook?.isStreaming || false, // Use wand streaming state
     onStreamingEnd: () => {
       logger.debug('Wand streaming ended, value persisted', { blockId, subBlockId })
@@ -391,6 +391,11 @@ export function LongInput({
           onScroll={handleScroll}
           onWheel={handleWheel}
           onKeyDown={handleKeyDown}
+          onBlur={() => {
+            try {
+              useOperationQueueStore.getState().flushDebouncedForBlock(blockId)
+            } catch {}
+          }}
           onFocus={() => {
             setShowEnvVars(false)
             setShowTags(false)

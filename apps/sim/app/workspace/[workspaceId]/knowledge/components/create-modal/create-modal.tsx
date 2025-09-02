@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, ChevronDown, X } from 'lucide-react'
+import { AlertCircle, Check, Loader2, X, ChevronDown } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -12,24 +12,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
 import { createLogger } from '@/lib/logs/console/logger'
+import { ACCEPT_ATTRIBUTE, ACCEPTED_FILE_TYPES, MAX_FILE_SIZE } from '@/lib/uploads/validation'
 import { getDocumentIcon } from '@/app/workspace/[workspaceId]/knowledge/components'
 import { useKnowledgeUpload } from '@/app/workspace/[workspaceId]/knowledge/hooks/use-knowledge-upload'
 import type { KnowledgeBaseData } from '@/stores/knowledge/store'
 
 const logger = createLogger('CreateModal')
-
-const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
-const ACCEPTED_FILE_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'text/plain',
-  'text/csv',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-]
 
 interface FileWithPreview extends File {
   preview: string
@@ -90,9 +81,10 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const dropZoneRef = useRef<HTMLDivElement>(null)
 
-  const { uploadFiles } = useKnowledgeUpload({
+  const { uploadFiles, isUploading, uploadProgress } = useKnowledgeUpload({
     onUploadComplete: (uploadedFiles) => {
       logger.info(`Successfully uploaded ${uploadedFiles.length} files`)
+      // Files uploaded and document records created - processing will continue in background
     },
   })
 
@@ -168,7 +160,7 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
         // Check file type
         if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
           setFileError(
-            `File ${file.name} has an unsupported format. Please use PDF, DOC, DOCX, TXT, CSV, XLS, or XLSX.`
+            `File ${file.name} has an unsupported format. Please use PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, MD, PPT, PPTX, or HTML.`
           )
           hasError = true
           continue
@@ -305,6 +297,12 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
       const newKnowledgeBase = result.data
 
       if (files.length > 0) {
+        newKnowledgeBase.docCount = files.length
+
+        if (onKnowledgeBaseCreated) {
+          onKnowledgeBaseCreated(newKnowledgeBase)
+        }
+
         const uploadedFiles = await uploadFiles(files, newKnowledgeBase.id, {
           chunkSize: data.maxChunkSize,
           minCharactersPerChunk: data.minChunkSize,
@@ -312,22 +310,17 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
           recipe: 'default',
         })
 
-        // Update the knowledge base object with the correct document count
-        newKnowledgeBase.docCount = uploadedFiles.length
-
+        logger.info(`Successfully uploaded ${uploadedFiles.length} files`)
         logger.info(`Started processing ${uploadedFiles.length} documents in the background`)
+      } else {
+        if (onKnowledgeBaseCreated) {
+          onKnowledgeBaseCreated(newKnowledgeBase)
+        }
       }
 
-      // Clean up file previews
       files.forEach((file) => URL.revokeObjectURL(file.preview))
       setFiles([])
 
-      // Call the callback if provided
-      if (onKnowledgeBaseCreated) {
-        onKnowledgeBaseCreated(newKnowledgeBase)
-      }
-
-      // Close modal immediately - no need for success message
       onOpenChange(false)
     } catch (error) {
       logger.error('Error creating knowledge base:', error)
@@ -512,7 +505,7 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                         <input
                           ref={fileInputRef}
                           type='file'
-                          accept={ACCEPTED_FILE_TYPES.join(',')}
+                          accept={ACCEPT_ATTRIBUTE}
                           onChange={handleFileChange}
                           className='hidden'
                           multiple
@@ -529,7 +522,8 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                                 : 'Drop files here or click to browse'}
                             </p>
                             <p className='text-muted-foreground text-xs'>
-                              Supports PDF, DOC, DOCX, TXT, CSV, XLS, XLSX (max 100MB each)
+                              Supports PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, MD, PPT, PPTX, HTML (max
+                              100MB each)
                             </p>
                           </div>
                         </div>
@@ -553,7 +547,7 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                           <input
                             ref={fileInputRef}
                             type='file'
-                            accept={ACCEPTED_FILE_TYPES.join(',')}
+                            accept={ACCEPT_ATTRIBUTE}
                             onChange={handleFileChange}
                             className='hidden'
                             multiple
@@ -570,7 +564,8 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                                   : 'Drop more files or click to browse'}
                               </p>
                               <p className='text-muted-foreground text-xs'>
-                                PDF, DOC, DOCX, TXT, CSV, XLS, XLSX (max 100MB each)
+                                PDF, DOC, DOCX, TXT, CSV, XLS, XLSX, MD, PPT, PPTX, HTML (max 100MB
+                                each)
                               </p>
                             </div>
                           </div>
@@ -578,29 +573,57 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
 
                         {/* File list */}
                         <div className='space-y-2'>
-                          {files.map((file, index) => (
-                            <div
-                              key={index}
-                              className='flex items-center gap-3 rounded-md border p-3'
-                            >
-                              {getFileIcon(file.type, file.name)}
-                              <div className='min-w-0 flex-1'>
-                                <p className='truncate font-medium text-sm'>{file.name}</p>
-                                <p className='text-muted-foreground text-xs'>
-                                  {formatFileSize(file.size)}
-                                </p>
-                              </div>
-                              <Button
-                                type='button'
-                                variant='ghost'
-                                size='sm'
-                                onClick={() => removeFile(index)}
-                                className='h-8 w-8 p-0 text-muted-foreground hover:text-destructive'
+                          {files.map((file, index) => {
+                            const fileStatus = uploadProgress.fileStatuses?.[index]
+                            const isCurrentlyUploading = fileStatus?.status === 'uploading'
+                            const isCompleted = fileStatus?.status === 'completed'
+                            const isFailed = fileStatus?.status === 'failed'
+
+                            return (
+                              <div
+                                key={index}
+                                className='flex items-center gap-3 rounded-md border p-3'
                               >
-                                <X className='h-4 w-4' />
-                              </Button>
-                            </div>
-                          ))}
+                                {getFileIcon(file.type, file.name)}
+                                <div className='min-w-0 flex-1'>
+                                  <div className='flex items-center gap-2'>
+                                    {isCurrentlyUploading && (
+                                      <Loader2 className='h-4 w-4 animate-spin text-[var(--brand-primary-hex)]' />
+                                    )}
+                                    {isCompleted && <Check className='h-4 w-4 text-green-500' />}
+                                    {isFailed && <X className='h-4 w-4 text-red-500' />}
+                                    <p className='truncate font-medium text-sm'>{file.name}</p>
+                                  </div>
+                                  <div className='flex items-center gap-2'>
+                                    <p className='text-muted-foreground text-xs'>
+                                      {formatFileSize(file.size)}
+                                    </p>
+                                    {isCurrentlyUploading && (
+                                      <div className='min-w-0 max-w-32 flex-1'>
+                                        <Progress
+                                          value={fileStatus?.progress || 0}
+                                          className='h-1'
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                  {isFailed && fileStatus?.error && (
+                                    <p className='mt-1 text-red-500 text-xs'>{fileStatus.error}</p>
+                                  )}
+                                </div>
+                                <Button
+                                  type='button'
+                                  variant='ghost'
+                                  size='sm'
+                                  onClick={() => removeFile(index)}
+                                  disabled={isUploading}
+                                  className='h-8 w-8 p-0 text-muted-foreground hover:text-destructive'
+                                >
+                                  <X className='h-4 w-4' />
+                                </Button>
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     )}
@@ -627,7 +650,15 @@ export function CreateModal({ open, onOpenChange, onKnowledgeBaseCreated }: Crea
                   disabled={isSubmitting}
                   className='bg-[#21A29A] font-[480] text-primary-foreground shadow-[0_0_0_0_#21A29A] transition-all duration-200 hover:bg-[#21A29A] hover:shadow-[0_0_0_4px_rgba(127,47,255,0.15)]'
                 >
-                  {isSubmitting ? 'Creating...' : 'Create Knowledge Base'}
+                  {isSubmitting
+                    ? isUploading
+                      ? uploadProgress.stage === 'uploading'
+                        ? `Uploading ${uploadProgress.filesCompleted}/${uploadProgress.totalFiles}...`
+                        : uploadProgress.stage === 'processing'
+                          ? 'Processing...'
+                          : 'Creating...'
+                      : 'Creating...'
+                    : 'Create Knowledge Base'}
                 </Button>
               </div>
             </div>

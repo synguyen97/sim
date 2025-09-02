@@ -12,7 +12,7 @@ import { getAssetUrl } from '@/lib/utils'
 import '@/app/globals.css'
 import { HideNextJsToast } from './HideNextJsToast'
 
-import { SessionProvider } from '@/lib/session-context'
+import { SessionProvider } from '@/lib/session/session-context'
 import { ThemeProvider } from '@/app/theme-provider'
 import { ZoomPrevention } from '@/app/zoom-prevention'
 
