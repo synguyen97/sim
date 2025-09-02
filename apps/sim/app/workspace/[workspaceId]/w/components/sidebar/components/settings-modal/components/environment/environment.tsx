@@ -15,8 +15,11 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { createLogger } from '@/lib/logs/console/logger'
 import { useEnvironmentStore } from '@/stores/settings/environment/store'
 import type { EnvironmentVariable as StoreEnvironmentVariable } from '@/stores/settings/environment/types'
+
+const logger = createLogger('EnvironmentVariables')
 
 // Constants
 const GRID_COLS = 'grid grid-cols-[minmax(0,1fr),minmax(0,1fr),40px] gap-4'
@@ -161,13 +164,27 @@ export function EnvironmentVariables({
     const inputType = (e.target as HTMLInputElement).getAttribute('data-input-type') as
       | 'key'
       | 'value'
-    const containsKeyValuePair = text.includes('=')
 
-    if (inputType && !containsKeyValuePair) {
-      handleSingleValuePaste(text, index, inputType)
-      return
+    // If we're in a specific input field, check if this looks like environment variable key-value pairs
+    if (inputType) {
+      // Check if this looks like valid environment variable key-value pairs
+      const hasValidEnvVarPattern = lines.some((line) => {
+        const equalIndex = line.indexOf('=')
+        if (equalIndex === -1 || equalIndex === 0) return false
+
+        const potentialKey = line.substring(0, equalIndex).trim()
+        const envVarPattern = /^[A-Za-z_][A-Za-z0-9_]*$/
+        return envVarPattern.test(potentialKey)
+      })
+
+      // If it doesn't look like env vars, treat as single value paste
+      if (!hasValidEnvVarPattern) {
+        handleSingleValuePaste(text, index, inputType)
+        return
+      }
     }
 
+    // Try to parse as key-value pairs
     handleKeyValuePaste(lines)
   }
 
@@ -180,14 +197,35 @@ export function EnvironmentVariables({
   const handleKeyValuePaste = (lines: string[]) => {
     const parsedVars = lines
       .map((line) => {
-        const [key, ...valueParts] = line.split('=')
-        const value = valueParts.join('=').trim()
+        // Only split on = if it looks like a proper environment variable (key=value format)
+        const equalIndex = line.indexOf('=')
+
+        // If no = found or = is at the beginning, skip this line
+        if (equalIndex === -1 || equalIndex === 0) {
+          return null
+        }
+
+        const potentialKey = line.substring(0, equalIndex).trim()
+
+        // Check if the potential key looks like an environment variable name
+        // Should be letters, numbers, underscores, and not contain spaces, URLs, etc.
+        const envVarPattern = /^[A-Za-z_][A-Za-z0-9_]*$/
+
+        // If it doesn't look like an env var name, skip this line
+        if (!envVarPattern.test(potentialKey)) {
+          return null
+        }
+
+        const key = potentialKey
+        const value = line.substring(equalIndex + 1).trim()
+
         return {
-          key: key.trim(),
+          key,
           value,
           id: Date.now() + Math.random(),
         }
       })
+      .filter((parsed): parsed is NonNullable<typeof parsed> => parsed !== null)
       .filter(({ key, value }) => key && value)
 
     if (parsedVars.length > 0) {
@@ -228,7 +266,7 @@ export function EnvironmentVariables({
       // Single store update that triggers sync
       useEnvironmentStore.getState().setVariables(validVariables)
     } catch (error) {
-      console.error('Failed to save environment variables:', error)
+      logger.error('Failed to save environment variables:', error)
     }
   }
 
