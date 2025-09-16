@@ -458,9 +458,6 @@ export function ShortInput({
           onBlur={() => {
             setIsFocused(false)
             setShowEnvVars(false)
-            try {
-              useOperationQueueStore.getState().flushDebouncedForBlock(blockId)
-            } catch {}
           }}
           onDrop={handleDrop}
           onDragOver={handleDragOver}

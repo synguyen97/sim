@@ -13,6 +13,7 @@ import {
   Credentials,
   EnvironmentVariables,
   General,
+  MCP,
   Privacy,
   SettingsNavigation,
   Subscription,
@@ -40,6 +41,7 @@ type SettingsSection =
   | 'team'
   | 'privacy'
   | 'copilot'
+  | 'mcp'
 
 export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const [activeSection, setActiveSection] = useState<SettingsSection>('general')
@@ -192,6 +194,11 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
             {activeSection === 'privacy' && (
               <div className='h-full'>
                 <Privacy />
+              </div>
+            )}
+            {activeSection === 'mcp' && (
+              <div className='h-full'>
+                <MCP />
               </div>
             )}
           </div>
