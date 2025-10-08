@@ -1,3 +1,5 @@
+import { db } from '@sim/db'
+import { workflowCheckpoints, workflow as workflowTable } from '@sim/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -9,8 +11,6 @@ import {
   createUnauthorizedResponse,
 } from '@/lib/copilot/auth'
 import { createLogger } from '@/lib/logs/console/logger'
-import { db } from '@/db'
-import { workflowCheckpoints, workflow as workflowTable } from '@/db/schema'
 
 const logger = createLogger('CheckpointRevertAPI')
 
@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
       parallels: checkpointState?.parallels || {},
       isDeployed: checkpointState?.isDeployed || false,
       deploymentStatuses: checkpointState?.deploymentStatuses || {},
-      hasActiveWebhook: checkpointState?.hasActiveWebhook || false,
       lastSaved: Date.now(),
       // Only include deployedAt if it's a valid date string that can be converted
       ...(checkpointState?.deployedAt &&

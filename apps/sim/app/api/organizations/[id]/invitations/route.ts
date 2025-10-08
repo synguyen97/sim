@@ -1,5 +1,15 @@
 import { randomUUID } from 'crypto'
-import { and, eq, inArray, isNull } from 'drizzle-orm'
+import { db } from '@sim/db'
+import {
+  invitation,
+  member,
+  organization,
+  user,
+  type WorkspaceInvitationStatus,
+  workspace,
+  workspaceInvitation,
+} from '@sim/db/schema'
+import { and, eq, inArray, isNull, or } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
 import {
   getEmailSubject,
@@ -16,16 +26,6 @@ import { quickValidateEmail } from '@/lib/email/validation'
 import { env } from '@/lib/env'
 import { createLogger } from '@/lib/logs/console/logger'
 import { hasWorkspaceAdminAccess } from '@/lib/permissions/utils'
-import { db } from '@/db'
-import {
-  invitation,
-  member,
-  organization,
-  user,
-  type WorkspaceInvitationStatus,
-  workspace,
-  workspaceInvitation,
-} from '@/db/schema'
 
 const logger = createLogger('OrganizationInvitations')
 
@@ -463,7 +463,10 @@ export async function DELETE(
         and(
           eq(invitation.id, invitationId),
           eq(invitation.organizationId, organizationId),
-          eq(invitation.status, 'pending')
+          or(
+            eq(invitation.status, 'pending'),
+            eq(invitation.status, 'rejected') // Allow cancelling rejected invitations too
+          )
         )
       )
       .returning()

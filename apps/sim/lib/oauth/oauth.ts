@@ -8,6 +8,7 @@ import {
   GoogleCalendarIcon,
   GoogleDocsIcon,
   GoogleDriveIcon,
+  GoogleFormsIcon,
   GoogleIcon,
   GoogleSheetsIcon,
   JiraIcon,
@@ -55,6 +56,8 @@ export type OAuthService =
   | 'google-docs'
   | 'google-sheets'
   | 'google-calendar'
+  | 'google-vault'
+  | 'google-forms'
   | 'github'
   | 'x'
   | 'supabase'
@@ -138,6 +141,19 @@ export const OAUTH_PROVIDERS: Record<string, OAuthProviderConfig> = {
         baseProviderIcon: (props) => GoogleIcon(props),
         scopes: ['https://www.googleapis.com/auth/drive.file'],
       },
+      'google-forms': {
+        id: 'google-forms',
+        name: 'Google Forms',
+        description: 'Retrieve Google Form responses.',
+        providerId: 'google-forms',
+        icon: (props) => GoogleFormsIcon(props),
+        baseProviderIcon: (props) => GoogleIcon(props),
+        scopes: [
+          'https://www.googleapis.com/auth/userinfo.email',
+          'https://www.googleapis.com/auth/userinfo.profile',
+          'https://www.googleapis.com/auth/forms.responses.readonly',
+        ],
+      },
       'google-calendar': {
         id: 'google-calendar',
         name: 'Google Calendar',
@@ -146,6 +162,18 @@ export const OAUTH_PROVIDERS: Record<string, OAuthProviderConfig> = {
         icon: (props) => GoogleCalendarIcon(props),
         baseProviderIcon: (props) => GoogleIcon(props),
         scopes: ['https://www.googleapis.com/auth/calendar'],
+      },
+      'google-vault': {
+        id: 'google-vault',
+        name: 'Google Vault',
+        description: 'Search, export, and manage matters/holds via Google Vault.',
+        providerId: 'google-vault',
+        icon: (props) => GoogleIcon(props),
+        baseProviderIcon: (props) => GoogleIcon(props),
+        scopes: [
+          'https://www.googleapis.com/auth/ediscovery',
+          'https://www.googleapis.com/auth/devstorage.read_only',
+        ],
       },
     },
     defaultService: 'gmail',
@@ -245,6 +273,7 @@ export const OAUTH_PROVIDERS: Record<string, OAuthProviderConfig> = {
           'email',
           'Sites.Read.All',
           'Sites.ReadWrite.All',
+          'Sites.Manage.All',
           'offline_access',
         ],
       },
@@ -514,6 +543,12 @@ export function getServiceIdFromScopes(provider: OAuthProvider, scopes: string[]
     }
     if (scopes.some((scope) => scope.includes('calendar'))) {
       return 'google-calendar'
+    }
+    if (scopes.some((scope) => scope.includes('forms'))) {
+      return 'google-forms'
+    }
+    if (scopes.some((scope) => scope.includes('ediscovery'))) {
+      return 'google-vault'
     }
   } else if (provider === 'microsoft-teams') {
     return 'microsoft-teams'
@@ -928,7 +963,6 @@ export async function refreshOAuthToken(
         status: response.status,
         error: errorText,
         parsedError: errorData,
-        provider,
         providerId,
       })
       throw new Error(`Failed to refresh token: ${response.status} ${errorText}`)

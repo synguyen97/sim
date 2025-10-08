@@ -14,7 +14,7 @@ import {
 } from '@react-email/components'
 import EmailFooter from '@/components/emails/footer'
 import { getBrandConfig } from '@/lib/branding/branding'
-import { env } from '@/lib/env'
+import { getEnv } from '@/lib/env'
 import { baseStyles } from './base-styles'
 
 interface PlanWelcomeEmailProps {
@@ -31,7 +31,7 @@ export function PlanWelcomeEmail({
   createdDate = new Date(),
 }: PlanWelcomeEmailProps) {
   const brand = getBrandConfig()
-  const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://sim.ai'
+  const baseUrl = getEnv('NEXT_PUBLIC_APP_URL') || 'https://sim.ai'
   const cta = loginLink || `${baseUrl}/login`
 
   const previewText = `${brand.name}: Your ${planName} plan is active`
@@ -46,7 +46,7 @@ export function PlanWelcomeEmail({
             <Row>
               <Column style={{ textAlign: 'center' }}>
                 <Img
-                  src={brand.logoUrl || '/logo/reverse/text/medium.png'}
+                  src={brand.logoUrl || `${baseUrl}/logo/reverse/text/medium.png`}
                   width='114'
                   alt={brand.name}
                   style={{

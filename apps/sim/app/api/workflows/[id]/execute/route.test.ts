@@ -78,7 +78,7 @@ describe('Workflow Execution API Route', () => {
       }),
     }))
 
-    vi.doMock('@/db/schema', () => ({
+    vi.doMock('@sim/db/schema', () => ({
       subscription: {
         plan: 'plan',
         referenceId: 'referenceId',
@@ -205,7 +205,7 @@ describe('Workflow Execution API Route', () => {
       }),
     }))
 
-    vi.doMock('@/db', () => {
+    vi.doMock('@sim/db', () => {
       const mockDb = {
         select: vi.fn().mockImplementation((columns) => ({
           from: vi.fn().mockImplementation((table) => ({
@@ -292,7 +292,7 @@ describe('Workflow Execution API Route', () => {
     const Executor = (await import('@/executor')).Executor
     expect(Executor).toHaveBeenCalled()
 
-    expect(executeMock).toHaveBeenCalledWith('workflow-id')
+    expect(executeMock).toHaveBeenCalledWith('workflow-id', 'starter-id')
   })
 
   /**
@@ -337,7 +337,7 @@ describe('Workflow Execution API Route', () => {
     const Executor = (await import('@/executor')).Executor
     expect(Executor).toHaveBeenCalled()
 
-    expect(executeMock).toHaveBeenCalledWith('workflow-id')
+    expect(executeMock).toHaveBeenCalledWith('workflow-id', 'starter-id')
 
     expect(Executor).toHaveBeenCalledWith(
       expect.objectContaining({

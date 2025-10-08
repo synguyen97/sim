@@ -17,7 +17,6 @@ import type {
   MessageFileAttachment,
   UserInputRef,
 } from '@/app/workspace/[workspaceId]/w/[workflowId]/components/panel/components/copilot/components/user-input/user-input'
-import { COPILOT_TOOL_IDS } from '@/stores/copilot/constants'
 import { usePreviewStore } from '@/stores/copilot/preview-store'
 import { useCopilotStore } from '@/stores/copilot/store'
 import { useWorkflowRegistry } from '@/stores/workflows/registry/store'
@@ -30,6 +29,7 @@ interface CopilotProps {
 
 interface CopilotRef {
   createNewChat: () => void
+  setInputValueAndFocus: (value: string) => void
 }
 
 export const Copilot = forwardRef<CopilotRef, CopilotProps>(({ panelWidth }, ref) => {
@@ -291,29 +291,6 @@ export const Copilot = forwardRef<CopilotRef, CopilotProps>(({ panelWidth }, ref
     }
   }, [isSendingMessage, abortMessage])
 
-  // Watch for completed preview_workflow tool calls in the new format
-  useEffect(() => {
-    if (!messages.length) return
-
-    const lastMessage = messages[messages.length - 1]
-    if (lastMessage.role !== 'assistant' || !lastMessage.toolCalls) return
-
-    // Check for completed preview_workflow tool calls
-    const previewToolCall = lastMessage.toolCalls.find(
-      (tc) =>
-        tc.name === COPILOT_TOOL_IDS.BUILD_WORKFLOW &&
-        tc.state === 'success' &&
-        !isToolCallSeen(tc.id)
-    )
-
-    if (previewToolCall) {
-      logger.info('Preview workflow completed via native SSE')
-      // Mark as seen to prevent duplicate processing
-      markToolCallAsSeen(previewToolCall.id)
-      // Tool call handling logic would go here if needed
-    }
-  }, [messages, isToolCallSeen, markToolCallAsSeen])
-
   // Handle new chat creation
   const handleStartNewChat = useCallback(() => {
     // Preview clearing is now handled automatically by the copilot store
@@ -326,13 +303,24 @@ export const Copilot = forwardRef<CopilotRef, CopilotProps>(({ panelWidth }, ref
     }, 100) // Small delay to ensure DOM updates are complete
   }, [createNewChat])
 
+  const handleSetInputValueAndFocus = useCallback(
+    (value: string) => {
+      setInputValue(value)
+      setTimeout(() => {
+        userInputRef.current?.focus()
+      }, 150)
+    },
+    [setInputValue]
+  )
+
   // Expose functions to parent
   useImperativeHandle(
     ref,
     () => ({
       createNewChat: handleStartNewChat,
+      setInputValueAndFocus: handleSetInputValueAndFocus,
     }),
-    [handleStartNewChat]
+    [handleStartNewChat, handleSetInputValueAndFocus]
   )
 
   // Handle abort action
@@ -452,6 +440,7 @@ export const Copilot = forwardRef<CopilotRef, CopilotProps>(({ panelWidth }, ref
                 onModeChange={setMode}
                 value={inputValue}
                 onChange={setInputValue}
+                panelWidth={panelWidth}
               />
             )}
           </>

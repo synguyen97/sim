@@ -1,4 +1,6 @@
 import { randomUUID } from 'crypto'
+import { db } from '@sim/db'
+import { document, knowledgeBase, permissions } from '@sim/db/schema'
 import { and, count, eq, isNotNull, isNull, or } from 'drizzle-orm'
 import type {
   ChunkingConfig,
@@ -7,8 +9,6 @@ import type {
 } from '@/lib/knowledge/types'
 import { createLogger } from '@/lib/logs/console/logger'
 import { getUserEntityPermissions } from '@/lib/permissions/utils'
-import { db } from '@/db'
-import { document, knowledgeBase, permissions } from '@/db/schema'
 
 const logger = createLogger('KnowledgeBaseService')
 
@@ -135,6 +135,7 @@ export async function updateKnowledgeBase(
   updates: {
     name?: string
     description?: string
+    workspaceId?: string | null
     chunkingConfig?: {
       maxSize: number
       minSize: number
@@ -148,6 +149,7 @@ export async function updateKnowledgeBase(
     updatedAt: Date
     name?: string
     description?: string | null
+    workspaceId?: string | null
     chunkingConfig?: {
       maxSize: number
       minSize: number
@@ -161,6 +163,7 @@ export async function updateKnowledgeBase(
 
   if (updates.name !== undefined) updateData.name = updates.name
   if (updates.description !== undefined) updateData.description = updates.description
+  if (updates.workspaceId !== undefined) updateData.workspaceId = updates.workspaceId
   if (updates.chunkingConfig !== undefined) {
     updateData.chunkingConfig = updates.chunkingConfig
     updateData.embeddingModel = 'text-embedding-3-small'

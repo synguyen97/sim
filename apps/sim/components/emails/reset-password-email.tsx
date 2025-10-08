@@ -13,7 +13,7 @@ import {
 } from '@react-email/components'
 import { format } from 'date-fns'
 import { getBrandConfig } from '@/lib/branding/branding'
-import { env } from '@/lib/env'
+import { getEnv } from '@/lib/env'
 import { baseStyles } from './base-styles'
 import EmailFooter from './footer'
 
@@ -23,7 +23,7 @@ interface ResetPasswordEmailProps {
   updatedDate?: Date
 }
 
-const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://app.buildnuggets.ai'
+const baseUrl = getEnv('NEXT_PUBLIC_APP_URL') || 'https://app.buildnuggets.ai'
 
 export const ResetPasswordEmail = ({
   username = '',
@@ -42,7 +42,7 @@ export const ResetPasswordEmail = ({
             <Row>
               <Column style={{ textAlign: 'center' }}>
                 <Img
-                  src={brand.logoUrl || '/logo/reverse/text/medium.png'}
+                  src={brand.logoUrl || `${baseUrl}/logo/reverse/text/medium.png`}
                   width='114'
                   alt={brand.name}
                   style={{

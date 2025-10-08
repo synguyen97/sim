@@ -1,3 +1,5 @@
+import { db } from '@sim/db'
+import { userStats, workflow as workflowTable } from '@sim/db/schema'
 import { task } from '@trigger.dev/sdk'
 import { eq, sql } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,8 +11,6 @@ import { buildTraceSpans } from '@/lib/logs/execution/trace-spans/trace-spans'
 import { decryptSecret } from '@/lib/utils'
 import { loadDeployedWorkflowState } from '@/lib/workflows/db-helpers'
 import { updateWorkflowRunCounts } from '@/lib/workflows/utils'
-import { db } from '@/db'
-import { userStats, workflow as workflowTable } from '@/db/schema'
 import { Executor } from '@/executor'
 import { Serializer } from '@/serializer'
 import { mergeSubblockState } from '@/stores/workflows/server-utils'
@@ -127,6 +127,7 @@ export async function executeWorkflowJob(payload: WorkflowExecutionPayload) {
       contextExtensions: {
         executionId,
         workspaceId: workspaceId || '',
+        isDeployedContext: true,
       },
     })
 
@@ -191,6 +192,9 @@ export async function executeWorkflowJob(payload: WorkflowExecutionPayload) {
       stack: error.stack,
     })
 
+    const executionResult = error?.executionResult || { success: false, output: {}, logs: [] }
+    const { traceSpans } = buildTraceSpans(executionResult)
+
     await loggingSession.safeCompleteWithError({
       endedAt: new Date().toISOString(),
       totalDurationMs: 0,
@@ -198,6 +202,7 @@ export async function executeWorkflowJob(payload: WorkflowExecutionPayload) {
         message: error.message || 'Workflow execution failed',
         stackTrace: error.stack,
       },
+      traceSpans,
     })
 
     throw error

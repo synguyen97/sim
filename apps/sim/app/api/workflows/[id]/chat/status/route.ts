@@ -1,9 +1,9 @@
+import { db } from '@sim/db'
+import { chat } from '@sim/db/schema'
 import { eq } from 'drizzle-orm'
 import { createLogger } from '@/lib/logs/console/logger'
 import { generateRequestId } from '@/lib/utils'
 import { createErrorResponse, createSuccessResponse } from '@/app/api/workflows/utils'
-import { db } from '@/db'
-import { chat } from '@/db/schema'
 
 const logger = createLogger('ChatStatusAPI')
 
@@ -21,7 +21,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     const deploymentResults = await db
       .select({
         id: chat.id,
-        subdomain: chat.subdomain,
+        identifier: chat.identifier,
         isActive: chat.isActive,
       })
       .from(chat)
@@ -33,7 +33,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       deploymentResults.length > 0
         ? {
             id: deploymentResults[0].id,
-            subdomain: deploymentResults[0].subdomain,
+            identifier: deploymentResults[0].identifier,
           }
         : null
 

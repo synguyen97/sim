@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui'
 import { getEnv, isTruthy } from '@/lib/env'
-import { isHosted } from '@/lib/environment'
 import { createLogger } from '@/lib/logs/console/logger'
 import {
   Account,
@@ -16,6 +15,7 @@ import {
   MCP,
   Privacy,
   SettingsNavigation,
+  SSO,
   Subscription,
   TeamManagement,
 } from '@/app/workspace/[workspaceId]/w/components/sidebar/components/settings-modal/components'
@@ -39,6 +39,7 @@ type SettingsSection =
   | 'apikeys'
   | 'subscription'
   | 'team'
+  | 'sso'
   | 'privacy'
   | 'copilot'
   | 'mcp'
@@ -186,7 +187,12 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 <TeamManagement />
               </div>
             )}
-            {isHosted && activeSection === 'copilot' && (
+            {activeSection === 'sso' && (
+              <div className='h-full'>
+                <SSO />
+              </div>
+            )}
+            {activeSection === 'copilot' && (
               <div className='h-full'>
                 <Copilot />
               </div>

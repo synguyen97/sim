@@ -1,11 +1,11 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
+import { db } from '@sim/db'
+import { apiKey as apiKeyTable, workspace } from '@sim/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { authenticateApiKey } from '@/lib/api-key/auth'
 import { env } from '@/lib/env'
 import { createLogger } from '@/lib/logs/console/logger'
-import { db } from '@/db'
-import { apiKey as apiKeyTable, workspace } from '@/db/schema'
 
 const logger = createLogger('ApiKeyService')
 
@@ -122,6 +122,27 @@ export async function updateApiKeyLastUsed(keyId: string): Promise<void> {
     await db.update(apiKeyTable).set({ lastUsed: new Date() }).where(eq(apiKeyTable.id, keyId))
   } catch (error) {
     logger.error('Error updating API key last used:', error)
+  }
+}
+
+/**
+ * Given a pinned API key ID, resolve the owning userId (actor).
+ * Returns null if not found.
+ */
+export async function getApiKeyOwnerUserId(
+  pinnedApiKeyId: string | null | undefined
+): Promise<string | null> {
+  if (!pinnedApiKeyId) return null
+  try {
+    const rows = await db
+      .select({ userId: apiKeyTable.userId })
+      .from(apiKeyTable)
+      .where(eq(apiKeyTable.id, pinnedApiKeyId))
+      .limit(1)
+    return rows[0]?.userId ?? null
+  } catch (error) {
+    logger.error('Error resolving API key owner', { error, pinnedApiKeyId })
+    return null
   }
 }
 

@@ -72,7 +72,7 @@ describe('Knowledge Base By ID API Route', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    vi.doMock('@/db', () => ({
+    vi.doMock('@sim/db', () => ({
       db: mockDbChain,
     }))
 
@@ -234,6 +234,7 @@ describe('Knowledge Base By ID API Route', () => {
         {
           name: validUpdateData.name,
           description: validUpdateData.description,
+          workspaceId: undefined,
           chunkingConfig: undefined,
         },
         expect.any(String)

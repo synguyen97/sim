@@ -236,6 +236,14 @@ export async function executeTool(
           `[${requestId}] Successfully got access token for ${toolId}, length: ${data.accessToken?.length || 0}`
         )
 
+        // Preserve credential for downstream transforms while removing it from request payload
+        // so we don't leak it to external services.
+        if (contextParams.credential) {
+          ;(contextParams as any)._credentialId = contextParams.credential
+        }
+        if (workflowId) {
+          ;(contextParams as any)._workflowId = workflowId
+        }
         // Clean up params we don't need to pass to the actual tool
         contextParams.credential = undefined
         if (contextParams.workflowId) contextParams.workflowId = undefined
@@ -516,13 +524,17 @@ async function handleInternalRequest(
       // Many APIs (e.g., Microsoft Graph) return 202 with empty body
       responseData = { status }
     } else {
-      try {
-        responseData = await response.json()
-      } catch (jsonError) {
-        logger.error(`[${requestId}] JSON parse error for ${toolId}:`, {
-          error: jsonError instanceof Error ? jsonError.message : String(jsonError),
-        })
-        throw new Error(`Failed to parse response from ${toolId}: ${jsonError}`)
+      if (tool.transformResponse) {
+        responseData = null
+      } else {
+        try {
+          responseData = await response.json()
+        } catch (jsonError) {
+          logger.error(`[${requestId}] JSON parse error for ${toolId}:`, {
+            error: jsonError instanceof Error ? jsonError.message : String(jsonError),
+          })
+          throw new Error(`Failed to parse response from ${toolId}: ${jsonError}`)
+        }
       }
     }
 
@@ -550,11 +562,9 @@ async function handleInternalRequest(
           status: response.status,
           statusText: response.statusText,
           headers: response.headers,
-          // Provide the resolved URL so tool transforms can safely read response.url
           url: fullUrl,
-          json: async () => responseData,
-          text: async () =>
-            typeof responseData === 'string' ? responseData : JSON.stringify(responseData),
+          json: () => response.json(),
+          text: () => response.text(),
         } as Response
 
         const data = await tool.transformResponse(mockResponse, params)

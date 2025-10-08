@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 import { getBrandConfig } from '@/lib/branding/branding'
-import { env } from '@/lib/env'
+import { getEnv } from '@/lib/env'
 import { baseStyles } from './base-styles'
 import EmailFooter from './footer'
 
@@ -22,7 +22,7 @@ interface OTPVerificationEmailProps {
   chatTitle?: string
 }
 
-const baseUrl = env.NEXT_PUBLIC_APP_URL || 'https://app.buildnuggets.ai'
+const baseUrl = getEnv('NEXT_PUBLIC_APP_URL') || 'https://app.buildnuggets.ai'
 
 const getSubjectByType = (type: string, brandName: string, chatTitle?: string) => {
   switch (type) {
@@ -71,7 +71,7 @@ export const OTPVerificationEmail = ({
             <Row>
               <Column style={{ textAlign: 'center' }}>
                 <Img
-                  src={brand.logoUrl || '/logo/reverse/text/medium.png'}
+                  src={brand.logoUrl || `${baseUrl}/logo/reverse/text/medium.png`}
                   width='114'
                   alt={brand.name}
                   style={{

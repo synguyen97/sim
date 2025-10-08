@@ -1,43 +1,50 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { VariableManager } from '@/lib/variables/variable-manager'
+import { normalizeBlockName } from '@/stores/workflows/utils'
+
+export interface HighlightContext {
+  accessiblePrefixes?: Set<string>
+  highlightAll?: boolean
+}
+
+const SYSTEM_PREFIXES = new Set(['start', 'loop', 'parallel', 'variable'])
 
 /**
  * Formats text by highlighting block references (<...>) and environment variables ({{...}})
  * Used in code editor, long inputs, and short inputs for consistent syntax highlighting
- *
- * @param text The text to format
- * @param stripQuotes Whether to strip unnecessary quotes from the text (for plain text variables)
  */
-export function formatDisplayText(text: string, stripQuotes = false): ReactNode[] {
+export function formatDisplayText(text: string, context?: HighlightContext): ReactNode[] {
   if (!text) return []
 
-  // If stripQuotes is true, remove surrounding quotes that might have been added
-  // This is needed when displaying plain type variables in inputs
-  let processedText = text
-  if (stripQuotes && typeof text === 'string') {
-    // Use VariableManager to determine if quotes should be stripped
-    if (VariableManager.shouldStripQuotesForDisplay(text)) {
-      processedText = text.slice(1, -1)
+  const shouldHighlightPart = (part: string): boolean => {
+    if (!part.startsWith('<') || !part.endsWith('>')) {
+      return false
     }
+
+    if (context?.highlightAll) {
+      return true
+    }
+
+    const inner = part.slice(1, -1)
+    const [prefix] = inner.split('.')
+    const normalizedPrefix = normalizeBlockName(prefix)
+
+    if (SYSTEM_PREFIXES.has(normalizedPrefix)) {
+      return true
+    }
+
+    if (context?.accessiblePrefixes?.has(normalizedPrefix)) {
+      return true
+    }
+
+    return false
   }
 
-  // Split the text by both tag patterns <something.something> and {{ENV_VAR}}
-  const parts = processedText.split(/(<[^>]+>|\{\{[^}]+\}\})/g)
+  const parts = text.split(/(<[^>]+>|\{\{[^}]+\}\})/g)
 
   return parts.map((part, index) => {
-    // Handle block references
-    if (part.startsWith('<') && part.endsWith('>')) {
-      return (
-        <span key={index} className='text-blue-500'>
-          {part}
-        </span>
-      )
-    }
-
-    // Handle environment variables
-    if (part.match(/^\{\{[^}]+\}\}$/)) {
+    if (shouldHighlightPart(part) || part.match(/^\{\{[^}]+\}\}$/)) {
       return (
         <span key={index} className='text-blue-500'>
           {part}

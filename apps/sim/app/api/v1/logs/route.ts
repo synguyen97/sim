@@ -1,3 +1,5 @@
+import { db } from '@sim/db'
+import { permissions, workflow, workflowExecutionLogs } from '@sim/db/schema'
 import { and, eq, sql } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -5,8 +7,6 @@ import { createLogger } from '@/lib/logs/console/logger'
 import { buildLogFilters, getOrderBy } from '@/app/api/v1/logs/filters'
 import { createApiResponse, getUserLimits } from '@/app/api/v1/logs/meta'
 import { checkRateLimit, createRateLimitResponse } from '@/app/api/v1/middleware'
-import { db } from '@/db'
-import { permissions, workflow, workflowExecutionLogs } from '@/db/schema'
 
 const logger = createLogger('V1LogsAPI')
 
@@ -124,7 +124,13 @@ export async function GET(request: NextRequest) {
         workflowDescription: workflow.description,
       })
       .from(workflowExecutionLogs)
-      .innerJoin(workflow, eq(workflowExecutionLogs.workflowId, workflow.id))
+      .innerJoin(
+        workflow,
+        and(
+          eq(workflowExecutionLogs.workflowId, workflow.id),
+          eq(workflow.workspaceId, params.workspaceId)
+        )
+      )
       .innerJoin(
         permissions,
         and(

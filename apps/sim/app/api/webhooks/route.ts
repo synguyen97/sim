@@ -1,4 +1,6 @@
-import { and, eq } from 'drizzle-orm'
+import { db } from '@sim/db'
+import { webhook, workflow } from '@sim/db/schema'
+import { and, desc, eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { type NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
@@ -7,8 +9,6 @@ import { createLogger } from '@/lib/logs/console/logger'
 import { getUserEntityPermissions } from '@/lib/permissions/utils'
 import { generateRequestId } from '@/lib/utils'
 import { getOAuthToken } from '@/app/api/auth/oauth/utils'
-import { db } from '@/db'
-import { webhook, workflow } from '@/db/schema'
 
 const logger = createLogger('WebhooksAPI')
 
@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
         .from(webhook)
         .innerJoin(workflow, eq(webhook.workflowId, workflow.id))
         .where(and(eq(webhook.workflowId, workflowId), eq(webhook.blockId, blockId)))
+        .orderBy(desc(webhook.updatedAt))
 
       logger.info(
         `[${requestId}] Retrieved ${webhooks.length} webhooks for workflow ${workflowId} block ${blockId}`

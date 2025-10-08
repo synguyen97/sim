@@ -1,3 +1,5 @@
+import { db } from '@sim/db'
+import { settings } from '@sim/db/schema'
 import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { NextResponse } from 'next/server'
@@ -5,8 +7,6 @@ import { z } from 'zod'
 import { getSession } from '@/lib/auth'
 import { createLogger } from '@/lib/logs/console/logger'
 import { generateRequestId } from '@/lib/utils'
-import { db } from '@/db'
-import { settings } from '@/db/schema'
 
 const logger = createLogger('UserSettingsAPI')
 
@@ -26,6 +26,8 @@ const SettingsSchema = z.object({
     })
     .optional(),
   billingUsageNotificationsEnabled: z.boolean().optional(),
+  showFloatingControls: z.boolean().optional(),
+  showTrainingControls: z.boolean().optional(),
 })
 
 // Default settings values
@@ -38,6 +40,8 @@ const defaultSettings = {
   telemetryEnabled: true,
   emailPreferences: {},
   billingUsageNotificationsEnabled: true,
+  showFloatingControls: true,
+  showTrainingControls: false,
 }
 
 export async function GET() {
@@ -72,6 +76,8 @@ export async function GET() {
           telemetryEnabled: userSettings.telemetryEnabled,
           emailPreferences: userSettings.emailPreferences ?? {},
           billingUsageNotificationsEnabled: userSettings.billingUsageNotificationsEnabled ?? true,
+          showFloatingControls: userSettings.showFloatingControls ?? true,
+          showTrainingControls: userSettings.showTrainingControls ?? false,
         },
       },
       { status: 200 }

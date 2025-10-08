@@ -11,6 +11,7 @@ import { createLogger } from '@/lib/logs/console/logger'
 import { cn } from '@/lib/utils'
 import { WandPromptBar } from '@/app/workspace/[workspaceId]/w/[workflowId]/components/wand-prompt-bar/wand-prompt-bar'
 import { useSubBlockValue } from '@/app/workspace/[workspaceId]/w/[workflowId]/components/workflow-block/components/sub-block/hooks/use-sub-block-value'
+import { useAccessibleReferencePrefixes } from '@/app/workspace/[workspaceId]/w/[workflowId]/hooks/use-accessible-reference-prefixes'
 import { useWand } from '@/app/workspace/[workspaceId]/w/[workflowId]/hooks/use-wand'
 import type { SubBlockConfig } from '@/blocks/types'
 import { useTagSelection } from '@/hooks/use-tag-selection'
@@ -95,6 +96,7 @@ export function LongInput({
   const overlayRef = useRef<HTMLDivElement>(null)
   const [activeSourceBlockId, setActiveSourceBlockId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const accessiblePrefixes = useAccessibleReferencePrefixes(blockId)
 
   // Use preview value when in preview mode, otherwise use store value or prop value
   const baseValue = isPreview ? previewValue : propValue !== undefined ? propValue : storeValue
@@ -409,16 +411,18 @@ export function LongInput({
         />
         <div
           ref={overlayRef}
-          className='pointer-events-none absolute inset-0 whitespace-pre-wrap break-words bg-transparent px-3 py-2 text-sm'
+          className='pointer-events-none absolute inset-0 overflow-auto whitespace-pre-wrap break-words border border-transparent bg-transparent px-3 py-2 text-base md:text-sm'
           style={{
             fontFamily: 'inherit',
             lineHeight: 'inherit',
             width: '100%',
             height: `${height}px`,
-            overflow: 'hidden',
           }}
         >
-          {formatDisplayText(value?.toString() ?? '', true)}
+          {formatDisplayText(value?.toString() ?? '', {
+            accessiblePrefixes,
+            highlightAll: !accessiblePrefixes,
+          })}
         </div>
 
         {/* Wand Button */}
