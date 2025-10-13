@@ -1,9 +1,8 @@
-import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import * as schema from './schema'
 
 export * from './schema'
-export type { PostgresJsDatabase }
 
 const connectionString = process.env.DATABASE_URL!
 if (!connectionString) {
@@ -13,8 +12,8 @@ if (!connectionString) {
 const postgresClient = postgres(connectionString, {
   prepare: false,
   idle_timeout: 20,
-  connect_timeout: 10,
-  max: 20,
+  connect_timeout: 30,
+  max: 30,
   onnotice: () => {},
 })
 
