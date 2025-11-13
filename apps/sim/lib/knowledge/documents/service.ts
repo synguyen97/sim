@@ -1,6 +1,6 @@
 import crypto, { randomUUID } from 'crypto'
 import { db } from '@sim/db'
-import { document, embedding, knowledgeBaseTagDefinitions } from '@sim/db/schema'
+import { document, embedding, knowledgeBase, knowledgeBaseTagDefinitions } from '@sim/db/schema'
 import { tasks } from '@trigger.dev/sdk'
 import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { generateEmbeddings } from '@/lib/embeddings/utils'
@@ -434,6 +434,19 @@ export async function processDocumentAsync(
   try {
     logger.info(`[${documentId}] Starting document processing: ${docData.filename}`)
 
+    const kb = await db
+      .select({
+        userId: knowledgeBase.userId,
+        workspaceId: knowledgeBase.workspaceId,
+      })
+      .from(knowledgeBase)
+      .where(eq(knowledgeBase.id, knowledgeBaseId))
+      .limit(1)
+
+    if (kb.length === 0) {
+      throw new Error(`Knowledge base not found: ${knowledgeBaseId}`)
+    }
+
     await db
       .update(document)
       .set({
@@ -453,7 +466,9 @@ export async function processDocumentAsync(
           docData.mimeType,
           processingOptions.chunkSize || 512,
           processingOptions.chunkOverlap || 200,
-          processingOptions.minCharactersPerChunk || 1
+          processingOptions.minCharactersPerChunk || 1,
+          kb[0].userId,
+          kb[0].workspaceId
         )
 
         if (processed.chunks.length > LARGE_DOC_CONFIG.MAX_CHUNKS_PER_DOCUMENT) {
@@ -659,8 +674,25 @@ export async function createDocumentRecords(
     tag7?: string
   }>,
   knowledgeBaseId: string,
-  requestId: string
+  requestId: string,
+  userId?: string
 ): Promise<DocumentData[]> {
+  // Check storage limits before creating documents
+  if (userId) {
+    const totalSize = documents.reduce((sum, doc) => sum + doc.fileSize, 0)
+
+    // Get knowledge base owner
+    const kb = await db
+      .select({ userId: knowledgeBase.userId })
+      .from(knowledgeBase)
+      .where(eq(knowledgeBase.id, knowledgeBaseId))
+      .limit(1)
+
+    if (kb.length === 0) {
+      throw new Error('Knowledge base not found')
+    }
+  }
+
   return await db.transaction(async (tx) => {
     const now = new Date()
     const documentRecords = []
@@ -728,6 +760,22 @@ export async function createDocumentRecords(
       logger.info(
         `[${requestId}] Bulk created ${documentRecords.length} document records in knowledge base ${knowledgeBaseId}`
       )
+
+      await tx
+        .update(knowledgeBase)
+        .set({ updatedAt: now })
+        .where(eq(knowledgeBase.id, knowledgeBaseId))
+
+      if (userId) {
+        const totalSize = documents.reduce((sum, doc) => sum + doc.fileSize, 0)
+
+        // Get knowledge base owner
+        const kb = await db
+          .select({ userId: knowledgeBase.userId })
+          .from(knowledgeBase)
+          .where(eq(knowledgeBase.id, knowledgeBaseId))
+          .limit(1)
+      }
     }
 
     return returnData
@@ -928,7 +976,8 @@ export async function createSingleDocument(
     tag7?: string
   },
   knowledgeBaseId: string,
-  requestId: string
+  requestId: string,
+  userId?: string
 ): Promise<{
   id: string
   knowledgeBaseId: string
@@ -949,6 +998,20 @@ export async function createSingleDocument(
   tag6: string | null
   tag7: string | null
 }> {
+  // Check storage limits before creating document
+  if (userId) {
+    // Get knowledge base owner
+    const kb = await db
+      .select({ userId: knowledgeBase.userId })
+      .from(knowledgeBase)
+      .where(eq(knowledgeBase.id, knowledgeBaseId))
+      .limit(1)
+
+    if (kb.length === 0) {
+      throw new Error('Knowledge base not found')
+    }
+  }
+
   const documentId = randomUUID()
   const now = new Date()
 
@@ -992,7 +1055,21 @@ export async function createSingleDocument(
 
   await db.insert(document).values(newDocument)
 
+  await db
+    .update(knowledgeBase)
+    .set({ updatedAt: now })
+    .where(eq(knowledgeBase.id, knowledgeBaseId))
+
   logger.info(`[${requestId}] Document created: ${documentId} in knowledge base ${knowledgeBaseId}`)
+
+  if (userId) {
+    // Get knowledge base owner
+    const kb = await db
+      .select({ userId: knowledgeBase.userId })
+      .from(knowledgeBase)
+      .where(eq(knowledgeBase.id, knowledgeBaseId))
+      .limit(1)
+  }
 
   return newDocument as {
     id: string
@@ -1023,7 +1100,8 @@ export async function bulkDocumentOperation(
   knowledgeBaseId: string,
   operation: 'enable' | 'disable' | 'delete',
   documentIds: string[],
-  requestId: string
+  requestId: string,
+  userId?: string
 ): Promise<{
   success: boolean
   successCount: number
@@ -1071,6 +1149,23 @@ export async function bulkDocumentOperation(
   }>
 
   if (operation === 'delete') {
+    // Get file sizes before deletion for storage tracking
+    let totalSize = 0
+    if (userId) {
+      const documentsToDelete = await db
+        .select({ fileSize: document.fileSize })
+        .from(document)
+        .where(
+          and(
+            eq(document.knowledgeBaseId, knowledgeBaseId),
+            inArray(document.id, documentIds),
+            isNull(document.deletedAt)
+          )
+        )
+
+      totalSize = documentsToDelete.reduce((sum, doc) => sum + doc.fileSize, 0)
+    }
+
     // Handle bulk soft delete
     updateResult = await db
       .update(document)

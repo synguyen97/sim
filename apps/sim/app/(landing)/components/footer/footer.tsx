@@ -7,7 +7,7 @@ import {
   LinkedInIcon,
   xIcon as XIcon,
 } from '@/components/icons'
-import { inter } from '@/app/fonts/inter'
+import { inter } from '@/app/fonts/inter/inter'
 
 const blocks = [
   'Agent',
@@ -90,6 +90,7 @@ const tools = [
   'Wikipedia',
   'X',
   'YouTube',
+  'Zep',
 ]
 
 interface FooterProps {
@@ -216,16 +217,22 @@ export default function Footer({ fullWidth = false }: FooterProps) {
                 Enterprise
               </Link>
               <Link
-                href='/blog'
+                href='/studio'
                 className='text-[14px] text-muted-foreground transition-colors hover:text-foreground'
               >
-                Blog
+                Sim Studio
               </Link>
               <Link
                 href='/changelog'
                 className='text-[14px] text-muted-foreground transition-colors hover:text-foreground'
               >
                 Changelog
+              </Link>
+              <Link
+                href='/careers'
+                className='text-[14px] text-muted-foreground transition-colors hover:text-foreground'
+              >
+                Careers
               </Link>
               <Link
                 href='/privacy'

@@ -22,7 +22,6 @@
     "lint:all": "bun run lint && bun run lint:helm",
     "check": "bunx biome check --files-ignore-unknown=true",
     "prepare": "bun husky",
-    "prebuild": "bun run lint:check",
     "type-check": "turbo run type-check",
     "release": "bun run scripts/create-single-release.ts"
   },
@@ -36,9 +35,12 @@
   },
   "dependencies": {
     "@linear/sdk": "40.0.0",
+    "@modelcontextprotocol/sdk": "1.20.2",
     "@t3-oss/env-nextjs": "0.13.4",
+    "cronstrue": "3.3.0",
     "drizzle-orm": "^0.44.5",
     "mongodb": "6.19.0",
+    "onedollarstats": "0.0.10",
     "postgres": "^3.4.5",
     "remark-gfm": "4.0.1",
     "socket.io-client": "4.8.1",
@@ -51,7 +53,7 @@
     "drizzle-kit": "^0.31.4",
     "husky": "9.1.7",
     "lint-staged": "16.0.0",
-    "turbo": "2.5.8"
+    "turbo": "2.6.1"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,scss}": [

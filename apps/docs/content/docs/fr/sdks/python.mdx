@@ -1,5 +1,5 @@
 ---
-title: Python SDK
+title: Python
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout'
@@ -284,7 +284,6 @@ class AsyncExecutionResult:
 class WorkflowStatus:
     is_deployed: bool
     deployed_at: Optional[str] = None
-    is_published: bool = False
     needs_redeployment: bool = False
 ```
 
@@ -756,10 +755,6 @@ Configurez le client en utilisant des variables d'environnement :
     Copiez la clé API pour l'utiliser dans votre application Python.
   </Step>
 </Steps>
-
-<Callout type="warning">
-  Gardez votre clé API sécurisée et ne la soumettez jamais au contrôle de version. Utilisez des variables d'environnement ou une gestion de configuration sécurisée.
-</Callout>
 
 ## Prérequis
 

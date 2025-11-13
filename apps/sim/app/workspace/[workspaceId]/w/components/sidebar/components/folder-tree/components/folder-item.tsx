@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { Folder, FolderOpen, Pencil, Trash2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
+import { Tooltip } from '@/components/emcn'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +16,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { createLogger } from '@/lib/logs/console/logger'
 import { useUserPermissionsContext } from '@/app/workspace/[workspaceId]/providers/workspace-permissions-provider'
 import { type FolderTreeNode, useFolderStore } from '@/stores/folders/store'
@@ -47,7 +47,6 @@ export function FolderItem({
 }: FolderItemProps) {
   const { expandedFolders, toggleExpanded, updateFolderAPI, deleteFolder } = useFolderStore()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(folder.name)
@@ -169,22 +168,20 @@ export function FolderItem({
   }
 
   const confirmDelete = async () => {
-    setIsDeleting(true)
+    setShowDeleteDialog(false)
+
     try {
       await deleteFolder(folder.id, workspaceId)
-      setShowDeleteDialog(false)
     } catch (error) {
       logger.error('Failed to delete folder:', { error })
-    } finally {
-      setIsDeleting(false)
     }
   }
 
   if (isCollapsed) {
     return (
       <>
-        <Tooltip>
-          <TooltipTrigger asChild>
+        <Tooltip.Root>
+          <Tooltip.Trigger asChild>
             <div
               className={clsx(
                 'group mx-auto mb-1 flex h-8 w-8 cursor-pointer items-center justify-center',
@@ -212,11 +209,11 @@ export function FolderItem({
                 )}
               </div>
             </div>
-          </TooltipTrigger>
-          <TooltipContent side='right'>
+          </Tooltip.Trigger>
+          <Tooltip.Content side='right'>
             <p className='max-w-[200px] break-words'>{folder.name}</p>
-          </TooltipContent>
-        </Tooltip>
+          </Tooltip.Content>
+        </Tooltip.Root>
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -233,15 +230,12 @@ export function FolderItem({
             </AlertDialogHeader>
 
             <AlertDialogFooter className='flex'>
-              <AlertDialogCancel className='h-9 w-full rounded-[8px]' disabled={isDeleting}>
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel className='h-9 w-full rounded-[8px]'>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmDelete}
-                disabled={isDeleting}
                 className='h-9 w-full rounded-[8px] bg-red-500 text-white transition-all duration-200 hover:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600'
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                Delete
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -354,15 +348,12 @@ export function FolderItem({
           </AlertDialogHeader>
 
           <AlertDialogFooter className='flex'>
-            <AlertDialogCancel className='h-9 w-full rounded-[8px]' disabled={isDeleting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel className='h-9 w-full rounded-[8px]'>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              disabled={isDeleting}
               className='h-9 w-full rounded-[8px] bg-red-500 text-white transition-all duration-200 hover:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600'
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

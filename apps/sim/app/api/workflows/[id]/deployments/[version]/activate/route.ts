@@ -57,10 +57,12 @@ export async function POST(
         throw new Error('Deployment version not found')
       }
 
-      await tx
-        .update(workflow)
-        .set({ isDeployed: true, deployedAt: now })
-        .where(eq(workflow.id, id))
+      const updateData: Record<string, unknown> = {
+        isDeployed: true,
+        deployedAt: now,
+      }
+
+      await tx.update(workflow).set(updateData).where(eq(workflow.id, id))
     })
 
     return createSuccessResponse({ success: true, deployedAt: now })

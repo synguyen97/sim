@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Check, ChevronDown } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/emcn'
 import {
   Command,
   CommandEmpty,
@@ -16,6 +16,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { createLogger } from '@/lib/logs/console/logger'
+import {
+  commandListClass,
+  dropdownContentClass,
+  filterButtonClass,
+  workflowDropdownListStyle,
+} from '@/app/workspace/[workspaceId]/logs/components/filters/components/shared'
 import { useFilterStore } from '@/stores/logs/filters/store'
 
 const logger = createLogger('LogsWorkflowFilter')
@@ -84,22 +90,21 @@ export default function Workflow() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant='outline'
-          size='sm'
-          className='w-full justify-between rounded-[10px] border-[#E5E5E5] bg-[#FFFFFF] font-normal text-sm dark:border-[#414141] dark:bg-[var(--surface-elevated)]'
-        >
+        <Button variant='outline' className={filterButtonClass}>
           {loading ? 'Loading workflows...' : getSelectedWorkflowsText()}
           <ChevronDown className='ml-2 h-4 w-4 text-muted-foreground' />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='start'
-        className='w-[180px] rounded-lg border-[#E5E5E5] bg-[#FFFFFF] p-0 shadow-xs dark:border-[#414141] dark:bg-[var(--surface-elevated)]'
+        side='bottom'
+        avoidCollisions={false}
+        sideOffset={4}
+        className={dropdownContentClass}
       >
         <Command>
           <CommandInput placeholder='Search workflows...' onValueChange={(v) => setSearch(v)} />
-          <CommandList>
+          <CommandList className={commandListClass} style={workflowDropdownListStyle}>
             <CommandEmpty>{loading ? 'Loading workflows...' : 'No workflows found.'}</CommandEmpty>
             <CommandGroup>
               <CommandItem

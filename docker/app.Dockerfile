@@ -13,9 +13,10 @@ WORKDIR /app
 # Install turbo globally
 RUN bun install -g turbo
 
-COPY package.json bun.lock ./
-RUN mkdir -p apps
+COPY package.json bun.lock turbo.json ./
+RUN mkdir -p apps packages/db
 COPY apps/sim/package.json ./apps/sim/package.json
+COPY packages/db/package.json ./packages/db/package.json
 
 RUN bun install --omit dev --ignore-scripts
 
@@ -49,6 +50,11 @@ WORKDIR /app
 ARG DATABASE_URL="postgresql://user:pass@localhost:5432/dummy"
 ENV DATABASE_URL=${DATABASE_URL}
 
+# Provide dummy NEXT_PUBLIC_APP_URL for build-time evaluation
+# Runtime environments should override this with the actual URL
+ARG NEXT_PUBLIC_APP_URL="http://localhost:3000"
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+
 RUN bun run build
 
 # ========================================
@@ -63,19 +69,31 @@ RUN apk add --no-cache python3 py3-pip bash
 
 ENV NODE_ENV=production
 
-COPY --from=builder /app/apps/sim/public ./apps/sim/public
-COPY --from=builder /app/apps/sim/.next/standalone ./
-COPY --from=builder /app/apps/sim/.next/static ./apps/sim/.next/static
+# Create non-root user and group
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
 
-# Copy guardrails setup script and requirements
-COPY --from=builder /app/apps/sim/lib/guardrails/setup.sh ./apps/sim/lib/guardrails/setup.sh
-COPY --from=builder /app/apps/sim/lib/guardrails/requirements.txt ./apps/sim/lib/guardrails/requirements.txt
-COPY --from=builder /app/apps/sim/lib/guardrails/validate_pii.py ./apps/sim/lib/guardrails/validate_pii.py
+COPY --from=builder --chown=nextjs:nodejs /app/apps/sim/public ./apps/sim/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/sim/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/sim/.next/static ./apps/sim/.next/static
 
-# Run guardrails setup to create venv and install Python dependencies
+# Guardrails setup (files need to be owned by nextjs for runtime)
+COPY --from=builder --chown=nextjs:nodejs /app/apps/sim/lib/guardrails/setup.sh ./apps/sim/lib/guardrails/setup.sh
+COPY --from=builder --chown=nextjs:nodejs /app/apps/sim/lib/guardrails/requirements.txt ./apps/sim/lib/guardrails/requirements.txt
+COPY --from=builder --chown=nextjs:nodejs /app/apps/sim/lib/guardrails/validate_pii.py ./apps/sim/lib/guardrails/validate_pii.py
+
+# Run guardrails setup as root, then fix ownership of generated venv files
 RUN chmod +x ./apps/sim/lib/guardrails/setup.sh && \
     cd ./apps/sim/lib/guardrails && \
-    ./setup.sh
+    ./setup.sh && \
+    chown -R nextjs:nodejs /app/apps/sim/lib/guardrails
+
+# Create .next/cache directory with correct ownership
+RUN mkdir -p apps/sim/.next/cache && \
+    chown -R nextjs:nodejs /app
+
+# Switch to non-root user
+USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000 \

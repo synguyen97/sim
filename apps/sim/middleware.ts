@@ -23,7 +23,7 @@ function handleRootPathRedirects(
 ): NextResponse | null {
   const url = request.nextUrl
 
-  if (url.pathname !== '/' && url.pathname !== '/homepage') {
+  if (url.pathname !== '/') {
     return null
   }
 
@@ -35,14 +35,14 @@ function handleRootPathRedirects(
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Hosted: Allow access to /homepage route even for authenticated users
-  if (url.pathname === '/homepage') {
-    return NextResponse.rewrite(new URL('/', request.url))
-  }
-
   // For root path, redirect authenticated users to workspace
-  if (hasActiveSession && url.pathname === '/') {
-    return NextResponse.redirect(new URL('/workspace', request.url))
+  // Unless they have a 'from' query parameter (e.g., ?from=nav, ?from=settings)
+  // This allows intentional navigation to the homepage from anywhere in the app
+  if (hasActiveSession) {
+    const from = url.searchParams.get('from')
+    if (!from) {
+      return NextResponse.redirect(new URL('/workspace', request.url))
+    }
   }
 
   return null
@@ -148,6 +148,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (url.pathname.startsWith('/chat/')) {
+    return NextResponse.next()
+  }
+
+  // Allow public access to template pages for SEO
+  if (url.pathname.startsWith('/templates')) {
     return NextResponse.next()
   }
 

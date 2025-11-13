@@ -1,103 +1,23 @@
 import { db } from '@sim/db'
-import {
-  apiKey,
-  permissions,
-  userStats,
-  workflow as workflowTable,
-  workspace,
-} from '@sim/db/schema'
+import { permissions, workflow as workflowTable, workspace } from '@sim/db/schema'
 import type { InferSelectModel } from 'drizzle-orm'
 import { and, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
-import { getEnv } from '@/lib/env'
 import { createLogger } from '@/lib/logs/console/logger'
 import type { PermissionType } from '@/lib/permissions/utils'
+import { getBaseUrl } from '@/lib/urls/utils'
 import type { ExecutionResult } from '@/executor/types'
 import type { WorkflowState } from '@/stores/workflows/workflow/types'
 
 const logger = createLogger('WorkflowUtils')
 
-const WORKFLOW_BASE_SELECTION = {
-  id: workflowTable.id,
-  userId: workflowTable.userId,
-  workspaceId: workflowTable.workspaceId,
-  folderId: workflowTable.folderId,
-  name: workflowTable.name,
-  description: workflowTable.description,
-  color: workflowTable.color,
-  lastSynced: workflowTable.lastSynced,
-  createdAt: workflowTable.createdAt,
-  updatedAt: workflowTable.updatedAt,
-  isDeployed: workflowTable.isDeployed,
-  deployedState: workflowTable.deployedState,
-  deployedAt: workflowTable.deployedAt,
-  pinnedApiKeyId: workflowTable.pinnedApiKeyId,
-  collaborators: workflowTable.collaborators,
-  runCount: workflowTable.runCount,
-  lastRunAt: workflowTable.lastRunAt,
-  variables: workflowTable.variables,
-  isPublished: workflowTable.isPublished,
-  marketplaceData: workflowTable.marketplaceData,
-  pinnedApiKeyKey: apiKey.key,
-  pinnedApiKeyName: apiKey.name,
-  pinnedApiKeyType: apiKey.type,
-  pinnedApiKeyWorkspaceId: apiKey.workspaceId,
-}
-
 type WorkflowSelection = InferSelectModel<typeof workflowTable>
-type ApiKeySelection = InferSelectModel<typeof apiKey>
-
-type WorkflowRow = WorkflowSelection & {
-  pinnedApiKeyKey: ApiKeySelection['key'] | null
-  pinnedApiKeyName: ApiKeySelection['name'] | null
-  pinnedApiKeyType: ApiKeySelection['type'] | null
-  pinnedApiKeyWorkspaceId: ApiKeySelection['workspaceId'] | null
-}
-
-type WorkflowWithPinnedKey = WorkflowSelection & {
-  pinnedApiKey: Pick<ApiKeySelection, 'id' | 'name' | 'key' | 'type' | 'workspaceId'> | null
-}
-
-function mapWorkflowRow(row: WorkflowRow | undefined): WorkflowWithPinnedKey | undefined {
-  if (!row) {
-    return undefined
-  }
-
-  const {
-    pinnedApiKeyKey,
-    pinnedApiKeyName,
-    pinnedApiKeyType,
-    pinnedApiKeyWorkspaceId,
-    ...workflowWithoutDerived
-  } = row
-
-  const pinnedApiKey =
-    workflowWithoutDerived.pinnedApiKeyId && pinnedApiKeyKey && pinnedApiKeyName && pinnedApiKeyType
-      ? {
-          id: workflowWithoutDerived.pinnedApiKeyId,
-          name: pinnedApiKeyName,
-          key: pinnedApiKeyKey,
-          type: pinnedApiKeyType,
-          workspaceId: pinnedApiKeyWorkspaceId,
-        }
-      : null
-
-  return {
-    ...workflowWithoutDerived,
-    pinnedApiKey,
-  }
-}
 
 export async function getWorkflowById(id: string) {
-  const rows = await db
-    .select(WORKFLOW_BASE_SELECTION)
-    .from(workflowTable)
-    .leftJoin(apiKey, eq(workflowTable.pinnedApiKeyId, apiKey.id))
-    .where(eq(workflowTable.id, id))
-    .limit(1)
+  const rows = await db.select().from(workflowTable).where(eq(workflowTable.id, id)).limit(1)
 
-  return mapWorkflowRow(rows[0] as WorkflowRow | undefined)
+  return rows[0]
 }
 
 type WorkflowRecord = ReturnType<typeof getWorkflowById> extends Promise<infer R>
@@ -116,55 +36,50 @@ export async function getWorkflowAccessContext(
   workflowId: string,
   userId?: string
 ): Promise<WorkflowAccessContext | null> {
-  const rows = await db
-    .select({
-      ...WORKFLOW_BASE_SELECTION,
-      workspaceOwnerId: workspace.ownerId,
-      workspacePermission: permissions.permissionType,
-    })
-    .from(workflowTable)
-    .leftJoin(apiKey, eq(workflowTable.pinnedApiKeyId, apiKey.id))
-    .leftJoin(workspace, eq(workspace.id, workflowTable.workspaceId))
-    .leftJoin(
-      permissions,
-      and(
-        eq(permissions.entityType, 'workspace'),
-        eq(permissions.entityId, workflowTable.workspaceId),
-        userId ? eq(permissions.userId, userId) : eq(permissions.userId, '' as unknown as string)
-      )
-    )
-    .where(eq(workflowTable.id, workflowId))
-    .limit(1)
-
-  const row = rows[0] as
-    | (WorkflowRow & {
-        workspaceOwnerId: string | null
-        workspacePermission: PermissionType | null
-      })
-    | undefined
-
-  if (!row) {
-    return null
-  }
-
-  const workflow = mapWorkflowRow(row as WorkflowRow)
+  const workflow = await getWorkflowById(workflowId)
 
   if (!workflow) {
     return null
   }
 
-  const resolvedWorkspaceOwner = row.workspaceOwnerId ?? null
-  const resolvedWorkspacePermission = row.workspacePermission ?? null
+  let workspaceOwnerId: string | null = null
+  let workspacePermission: PermissionType | null = null
+
+  if (workflow.workspaceId) {
+    const [workspaceRow] = await db
+      .select({ ownerId: workspace.ownerId })
+      .from(workspace)
+      .where(eq(workspace.id, workflow.workspaceId))
+      .limit(1)
+
+    workspaceOwnerId = workspaceRow?.ownerId ?? null
+
+    if (userId) {
+      const [permissionRow] = await db
+        .select({ permissionType: permissions.permissionType })
+        .from(permissions)
+        .where(
+          and(
+            eq(permissions.userId, userId),
+            eq(permissions.entityType, 'workspace'),
+            eq(permissions.entityId, workflow.workspaceId)
+          )
+        )
+        .limit(1)
+
+      workspacePermission = permissionRow?.permissionType ?? null
+    }
+  }
 
   const resolvedUserId = userId ?? null
 
   const isOwner = resolvedUserId ? workflow.userId === resolvedUserId : false
-  const isWorkspaceOwner = resolvedUserId ? resolvedWorkspaceOwner === resolvedUserId : false
+  const isWorkspaceOwner = resolvedUserId ? workspaceOwnerId === resolvedUserId : false
 
   return {
     workflow,
-    workspaceOwnerId: resolvedWorkspaceOwner,
-    workspacePermission: resolvedWorkspacePermission,
+    workspaceOwnerId,
+    workspacePermission,
     isOwner,
     isWorkspaceOwner,
   }
@@ -178,63 +93,55 @@ export async function updateWorkflowRunCounts(workflowId: string, runs = 1) {
       throw new Error(`Workflow ${workflowId} not found`)
     }
 
-    // Get the origin from the environment or use direct DB update as fallback
-    const origin =
-      getEnv('NEXT_PUBLIC_APP_URL') || (typeof window !== 'undefined' ? window.location.origin : '')
+    // Use the API to update stats
+    const response = await fetch(`${getBaseUrl()}/api/workflows/${workflowId}/stats?runs=${runs}`, {
+      method: 'POST',
+    })
 
-    if (origin) {
-      // Use absolute URL with origin
-      const response = await fetch(`${origin}/api/workflows/${workflowId}/stats?runs=${runs}`, {
-        method: 'POST',
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to update workflow stats')
-      }
-
-      return response.json()
-    }
-    logger.warn('No origin available, updating workflow stats directly via DB')
-
-    // Update workflow directly through database
-    await db
-      .update(workflowTable)
-      .set({
-        runCount: (workflow.runCount as number) + runs,
-        lastRunAt: new Date(),
-      })
-      .where(eq(workflowTable.id, workflowId))
-
-    // Update user stats if needed
-    if (workflow.userId) {
-      const userStatsRecord = await db
-        .select()
-        .from(userStats)
-        .where(eq(userStats.userId, workflow.userId))
-        .limit(1)
-
-      if (userStatsRecord.length === 0) {
-        console.warn('User stats record not found - should be created during onboarding', {
-          userId: workflow.userId,
-        })
-        return // Skip stats update if record doesn't exist
-      }
-      // Update existing record
-      await db
-        .update(userStats)
-        .set({
-          totalManualExecutions: userStatsRecord[0].totalManualExecutions + runs,
-          lastActive: new Date(),
-        })
-        .where(eq(userStats.userId, workflow.userId))
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update workflow stats')
     }
 
-    return { success: true, runsAdded: runs }
+    return response.json()
   } catch (error) {
-    logger.error('Error updating workflow run counts:', error)
+    logger.error(`Error updating workflow stats for ${workflowId}`, error)
     throw error
   }
+}
+
+/**
+ * Sanitize tools array by removing UI-only fields
+ * @param tools - The tools array to sanitize
+ * @returns A sanitized tools array
+ */
+function sanitizeToolsForComparison(tools: any[] | undefined): any[] {
+  if (!Array.isArray(tools)) {
+    return []
+  }
+
+  return tools.map((tool) => {
+    // Remove UI-only field: isExpanded
+    const { isExpanded, ...cleanTool } = tool
+    return cleanTool
+  })
+}
+
+/**
+ * Sanitize inputFormat array by removing test-only value fields
+ * @param inputFormat - The inputFormat array to sanitize
+ * @returns A sanitized inputFormat array without test values
+ */
+function sanitizeInputFormatForComparison(inputFormat: any[] | undefined): any[] {
+  if (!Array.isArray(inputFormat)) {
+    return []
+  }
+
+  return inputFormat.map((field) => {
+    // Remove test-only field: value (used only for manual testing)
+    const { value, collapsed, ...cleanField } = field
+    return cleanField
+  })
 }
 
 /**
@@ -385,8 +292,24 @@ export function hasWorkflowChanged(
       }
 
       // Get values with special handling for null/undefined
-      const currentValue = currentSubBlocks[subBlockId].value ?? null
-      const deployedValue = deployedSubBlocks[subBlockId].value ?? null
+      let currentValue = currentSubBlocks[subBlockId].value ?? null
+      let deployedValue = deployedSubBlocks[subBlockId].value ?? null
+
+      // Special handling for 'tools' subBlock - sanitize UI-only fields
+      if (subBlockId === 'tools' && Array.isArray(currentValue) && Array.isArray(deployedValue)) {
+        currentValue = sanitizeToolsForComparison(currentValue)
+        deployedValue = sanitizeToolsForComparison(deployedValue)
+      }
+
+      // Special handling for 'inputFormat' subBlock - sanitize UI-only fields (collapsed state)
+      if (
+        subBlockId === 'inputFormat' &&
+        Array.isArray(currentValue) &&
+        Array.isArray(deployedValue)
+      ) {
+        currentValue = sanitizeInputFormatForComparison(currentValue)
+        deployedValue = sanitizeInputFormatForComparison(deployedValue)
+      }
 
       // For string values, compare directly to catch even small text changes
       if (typeof currentValue === 'string' && typeof deployedValue === 'string') {
