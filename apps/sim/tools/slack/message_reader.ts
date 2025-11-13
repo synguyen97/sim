@@ -14,13 +14,6 @@ export const slackMessageReaderTool: ToolConfig<
   oauth: {
     required: true,
     provider: 'slack',
-    additionalScopes: [
-      'channels:read',
-      'channels:history',
-      'groups:read',
-      'groups:history',
-      'users:read',
-    ],
   },
 
   params: {
@@ -73,7 +66,8 @@ export const slackMessageReaderTool: ToolConfig<
       const url = new URL('https://slack.com/api/conversations.history')
       url.searchParams.append('channel', params.channel)
       // Cap limit at 15 due to Slack API restrictions for non-Marketplace apps
-      url.searchParams.append('limit', String(Math.min(params.limit || 10, 15)))
+      const limit = params.limit ? Number(params.limit) : 10
+      url.searchParams.append('limit', String(Math.min(limit, 15)))
 
       if (params.oldest) {
         url.searchParams.append('oldest', params.oldest)
@@ -100,6 +94,13 @@ export const slackMessageReaderTool: ToolConfig<
       user: message.user || message.bot_id || 'unknown',
       type: message.type || 'message',
       subtype: message.subtype,
+      files: message.files?.map((file: any) => ({
+        id: file.id,
+        name: file.name,
+        mimetype: file.mimetype,
+        size: file.size,
+        url_private: file.url_private,
+      })),
     }))
 
     return {
@@ -122,6 +123,19 @@ export const slackMessageReaderTool: ToolConfig<
           user: { type: 'string' },
           type: { type: 'string' },
           subtype: { type: 'string' },
+          files: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                mimetype: { type: 'string' },
+                size: { type: 'number' },
+                url_private: { type: 'string' },
+              },
+            },
+          },
         },
       },
     },

@@ -3,13 +3,8 @@ import { env } from '@/lib/env'
 import { parseBuffer, parseFile } from '@/lib/file-parsers'
 import { retryWithExponentialBackoff } from '@/lib/knowledge/documents/utils'
 import { createLogger } from '@/lib/logs/console/logger'
-import {
-  type CustomStorageConfig,
-  getPresignedUrlWithConfig,
-  getStorageProvider,
-  uploadFile,
-} from '@/lib/uploads'
-import { BLOB_KB_CONFIG, S3_KB_CONFIG } from '@/lib/uploads/setup'
+import { StorageService } from '@/lib/uploads'
+import { downloadFileFromUrl } from '@/lib/uploads/utils/file-utils.server'
 import { mistralParserTool } from '@/tools/mistral/parser'
 
 const logger = createLogger('DocumentProcessor')
@@ -45,21 +40,6 @@ type AzureOCRResponse = {
   [key: string]: unknown
 }
 
-const getKBConfig = (): CustomStorageConfig => {
-  const provider = getStorageProvider()
-  return provider === 'blob'
-    ? {
-        containerName: BLOB_KB_CONFIG.containerName,
-        accountName: BLOB_KB_CONFIG.accountName,
-        accountKey: BLOB_KB_CONFIG.accountKey,
-        connectionString: BLOB_KB_CONFIG.connectionString,
-      }
-    : {
-        bucket: S3_KB_CONFIG.bucket,
-        region: S3_KB_CONFIG.region,
-      }
-}
-
 class APIError extends Error {
   public status: number
 
@@ -76,7 +56,9 @@ export async function processDocument(
   mimeType: string,
   chunkSize = 1000,
   chunkOverlap = 200,
-  minChunkSize = 1
+  minChunkSize = 1,
+  userId?: string,
+  workspaceId?: string | null
 ): Promise<{
   chunks: Chunk[]
   metadata: {
@@ -93,7 +75,7 @@ export async function processDocument(
   logger.info(`Processing document: ${filename}`)
 
   try {
-    const parseResult = await parseDocument(fileUrl, filename, mimeType)
+    const parseResult = await parseDocument(fileUrl, filename, mimeType, userId, workspaceId)
     const { content, processingMethod } = parseResult
     const cloudUrl = 'cloudUrl' in parseResult ? parseResult.cloudUrl : undefined
 
@@ -151,7 +133,9 @@ export async function processDocument(
 async function parseDocument(
   fileUrl: string,
   filename: string,
-  mimeType: string
+  mimeType: string,
+  userId?: string,
+  workspaceId?: string | null
 ): Promise<{
   content: string
   processingMethod: 'file-parser' | 'mistral-ocr'
@@ -166,12 +150,12 @@ async function parseDocument(
   if (isPDF && (hasAzureMistralOCR || hasMistralOCR)) {
     if (hasAzureMistralOCR) {
       logger.info(`Using Azure Mistral OCR: ${filename}`)
-      return parseWithAzureMistralOCR(fileUrl, filename, mimeType)
+      return parseWithAzureMistralOCR(fileUrl, filename, mimeType, userId, workspaceId)
     }
 
     if (hasMistralOCR) {
       logger.info(`Using Mistral OCR: ${filename}`)
-      return parseWithMistralOCR(fileUrl, filename, mimeType)
+      return parseWithMistralOCR(fileUrl, filename, mimeType, userId, workspaceId)
     }
   }
 
@@ -179,7 +163,13 @@ async function parseDocument(
   return parseWithFileParser(fileUrl, filename, mimeType)
 }
 
-async function handleFileForOCR(fileUrl: string, filename: string, mimeType: string) {
+async function handleFileForOCR(
+  fileUrl: string,
+  filename: string,
+  mimeType: string,
+  userId?: string,
+  workspaceId?: string | null
+) {
   const isExternalHttps = fileUrl.startsWith('https://') && !fileUrl.includes('/api/files/serve/')
 
   if (isExternalHttps) {
@@ -189,13 +179,36 @@ async function handleFileForOCR(fileUrl: string, filename: string, mimeType: str
   logger.info(`Uploading "${filename}" to cloud storage for OCR`)
 
   const buffer = await downloadFileWithTimeout(fileUrl)
-  const kbConfig = getKBConfig()
-
-  validateCloudConfig(kbConfig)
 
   try {
-    const cloudResult = await uploadFile(buffer, filename, mimeType, kbConfig)
-    const httpsUrl = await getPresignedUrlWithConfig(cloudResult.key, kbConfig, 900)
+    const metadata: Record<string, string> = {
+      originalName: filename,
+      uploadedAt: new Date().toISOString(),
+      purpose: 'knowledge-base',
+      ...(userId && { userId }),
+      ...(workspaceId && { workspaceId }),
+    }
+
+    const timestamp = Date.now()
+    const uniqueId = Math.random().toString(36).substring(2, 9)
+    const safeFileName = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
+    const customKey = `kb/${timestamp}-${uniqueId}-${safeFileName}`
+
+    const cloudResult = await StorageService.uploadFile({
+      file: buffer,
+      fileName: filename,
+      contentType: mimeType,
+      context: 'knowledge-base',
+      customKey,
+      metadata,
+    })
+
+    const httpsUrl = await StorageService.generatePresignedDownloadUrl(
+      cloudResult.key,
+      'knowledge-base',
+      900 // 15 minutes
+    )
+
     logger.info(`Successfully uploaded for OCR: ${cloudResult.key}`)
     return { httpsUrl, cloudUrl: httpsUrl }
   } catch (uploadError) {
@@ -205,34 +218,7 @@ async function handleFileForOCR(fileUrl: string, filename: string, mimeType: str
 }
 
 async function downloadFileWithTimeout(fileUrl: string): Promise<Buffer> {
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUTS.FILE_DOWNLOAD)
-
-  try {
-    const isInternalFileServe = fileUrl.includes('/api/files/serve/')
-    const headers: HeadersInit = {}
-
-    if (isInternalFileServe) {
-      const { generateInternalToken } = await import('@/lib/auth/internal')
-      const token = await generateInternalToken()
-      headers.Authorization = `Bearer ${token}`
-    }
-
-    const response = await fetch(fileUrl, { signal: controller.signal, headers })
-    clearTimeout(timeoutId)
-
-    if (!response.ok) {
-      throw new Error(`Failed to download file: ${response.statusText}`)
-    }
-
-    return Buffer.from(await response.arrayBuffer())
-  } catch (error) {
-    clearTimeout(timeoutId)
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('File download timed out')
-    }
-    throw error
-  }
+  return downloadFileFromUrl(fileUrl, TIMEOUTS.FILE_DOWNLOAD)
 }
 
 async function downloadFileForBase64(fileUrl: string): Promise<Buffer> {
@@ -248,25 +234,6 @@ async function downloadFileForBase64(fileUrl: string): Promise<Buffer> {
   }
   const fs = await import('fs/promises')
   return fs.readFile(fileUrl)
-}
-
-function validateCloudConfig(kbConfig: CustomStorageConfig) {
-  const provider = getStorageProvider()
-
-  if (provider === 'blob') {
-    if (
-      !kbConfig.containerName ||
-      (!kbConfig.connectionString && (!kbConfig.accountName || !kbConfig.accountKey))
-    ) {
-      throw new Error(
-        'Azure Blob configuration missing. Set AZURE_CONNECTION_STRING or AZURE_ACCOUNT_NAME + AZURE_ACCOUNT_KEY + AZURE_KB_CONTAINER_NAME'
-      )
-    }
-  } else {
-    if (!kbConfig.bucket || !kbConfig.region) {
-      throw new Error('S3 configuration missing. Set AWS_REGION and S3_KB_BUCKET_NAME')
-    }
-  }
 }
 
 function processOCRContent(result: OCRResult, filename: string): string {
@@ -339,7 +306,13 @@ async function makeOCRRequest(
   }
 }
 
-async function parseWithAzureMistralOCR(fileUrl: string, filename: string, mimeType: string) {
+async function parseWithAzureMistralOCR(
+  fileUrl: string,
+  filename: string,
+  mimeType: string,
+  userId?: string,
+  workspaceId?: string | null
+) {
   validateOCRConfig(
     env.OCR_AZURE_API_KEY,
     env.OCR_AZURE_ENDPOINT,
@@ -387,12 +360,18 @@ async function parseWithAzureMistralOCR(fileUrl: string, filename: string, mimeT
     })
 
     return env.MISTRAL_API_KEY
-      ? parseWithMistralOCR(fileUrl, filename, mimeType)
+      ? parseWithMistralOCR(fileUrl, filename, mimeType, userId, workspaceId)
       : parseWithFileParser(fileUrl, filename, mimeType)
   }
 }
 
-async function parseWithMistralOCR(fileUrl: string, filename: string, mimeType: string) {
+async function parseWithMistralOCR(
+  fileUrl: string,
+  filename: string,
+  mimeType: string,
+  userId?: string,
+  workspaceId?: string | null
+) {
   if (!env.MISTRAL_API_KEY) {
     throw new Error('Mistral API key required')
   }
@@ -401,21 +380,43 @@ async function parseWithMistralOCR(fileUrl: string, filename: string, mimeType: 
     throw new Error('Mistral parser tool not configured')
   }
 
-  const { httpsUrl, cloudUrl } = await handleFileForOCR(fileUrl, filename, mimeType)
+  const { httpsUrl, cloudUrl } = await handleFileForOCR(
+    fileUrl,
+    filename,
+    mimeType,
+    userId,
+    workspaceId
+  )
   const params = { filePath: httpsUrl, apiKey: env.MISTRAL_API_KEY, resultType: 'text' as const }
 
   try {
     const response = await retryWithExponentialBackoff(
       async () => {
-        const url =
+        let url =
           typeof mistralParserTool.request!.url === 'function'
             ? mistralParserTool.request!.url(params)
             : mistralParserTool.request!.url
 
-        const headers =
+        const isInternalRoute = url.startsWith('/')
+
+        if (isInternalRoute) {
+          const { getBaseUrl } = await import('@/lib/urls/utils')
+          url = `${getBaseUrl()}${url}`
+        }
+
+        let headers =
           typeof mistralParserTool.request!.headers === 'function'
             ? mistralParserTool.request!.headers(params)
             : mistralParserTool.request!.headers
+
+        if (isInternalRoute) {
+          const { generateInternalToken } = await import('@/lib/auth/internal')
+          const internalToken = await generateInternalToken(userId)
+          headers = {
+            ...headers,
+            Authorization: `Bearer ${internalToken}`,
+          }
+        }
 
         const requestBody = mistralParserTool.request!.body!(params) as OCRRequestBody
         return makeOCRRequest(url, headers as Record<string, string>, requestBody)

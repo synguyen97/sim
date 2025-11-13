@@ -8,18 +8,18 @@ import {
   Code2,
   Database,
   DollarSign,
-  Users,
+  HardDrive,
   Workflow,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createLogger } from '@/lib/logs/console/logger'
 import { cn } from '@/lib/utils'
-import { inter } from '@/app/fonts/inter'
+import { inter } from '@/app/fonts/inter/inter'
 import {
   ENTERPRISE_PLAN_FEATURES,
   PRO_PLAN_FEATURES,
   TEAM_PLAN_FEATURES,
-} from '@/app/workspace/[workspaceId]/w/components/sidebar/components/settings-modal/components/subscription/plan-configs'
+} from '@/app/workspace/[workspaceId]/w/components/sidebar/components-new/settings-modal/components/subscription/plan-configs'
 
 const logger = createLogger('LandingPricing')
 
@@ -42,8 +42,8 @@ interface PricingTier {
  */
 const FREE_PLAN_FEATURES: PricingFeature[] = [
   { icon: DollarSign, text: '$10 usage limit' },
+  { icon: HardDrive, text: '5GB file storage' },
   { icon: Workflow, text: 'Public template access' },
-  { icon: Users, text: 'Community support' },
   { icon: Database, text: 'Limited log retention' },
   { icon: Code2, text: 'CLI/SDK Access' },
 ]

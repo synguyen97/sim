@@ -10,7 +10,8 @@ import { registry as blockRegistry } from '@/blocks/registry'
 import type { BlockConfig } from '@/blocks/types'
 import { AuthMode } from '@/blocks/types'
 import { tools as toolsRegistry } from '@/tools/registry'
-import { TRIGGER_REGISTRY } from '@/triggers'
+import { getTrigger, isTriggerValid } from '@/triggers'
+import { SYSTEM_SUBBLOCK_IDS } from '@/triggers/consts'
 
 export interface CopilotSubblockMetadata {
   id: string
@@ -95,6 +96,7 @@ export interface CopilotBlockMetadata {
       inputSchema?: CopilotSubblockMetadata[]
     }
   >
+  outputs?: Record<string, any>
   yamlDocumentation?: string
 }
 
@@ -130,6 +132,7 @@ export const getBlocksMetadataServerTool: BaseServerTool<
           tools: [],
           triggers: [],
           operationInputSchema: operationParameters,
+          outputs: specialBlock.outputs,
         }
         ;(metadata as any).subBlocks = undefined
       } else {
@@ -160,17 +163,59 @@ export const getBlocksMetadataServerTool: BaseServerTool<
         const triggers: CopilotTriggerMetadata[] = []
         const availableTriggerIds = blockConfig.triggers?.available || []
         for (const tid of availableTriggerIds) {
-          const trig = TRIGGER_REGISTRY[tid]
+          if (!isTriggerValid(tid)) {
+            logger.debug('Invalid trigger ID found in block config', { blockId, triggerId: tid })
+            continue
+          }
+
+          const trig = getTrigger(tid)
+
+          const configFields: Record<string, any> = {}
+          for (const subBlock of trig.subBlocks) {
+            if (subBlock.mode === 'trigger' && !SYSTEM_SUBBLOCK_IDS.includes(subBlock.id)) {
+              const fieldDef: any = {
+                type: subBlock.type,
+                required: subBlock.required || false,
+              }
+
+              if (subBlock.title) fieldDef.title = subBlock.title
+              if (subBlock.description) fieldDef.description = subBlock.description
+              if (subBlock.placeholder) fieldDef.placeholder = subBlock.placeholder
+              if (subBlock.defaultValue !== undefined) fieldDef.default = subBlock.defaultValue
+
+              if (subBlock.options && Array.isArray(subBlock.options)) {
+                fieldDef.options = subBlock.options.map((opt: any) => ({
+                  id: opt.id,
+                  label: opt.label || opt.id,
+                }))
+              }
+
+              if (subBlock.condition) {
+                const cond =
+                  typeof subBlock.condition === 'function'
+                    ? subBlock.condition()
+                    : subBlock.condition
+                if (cond) {
+                  fieldDef.condition = cond
+                }
+              }
+
+              configFields[subBlock.id] = fieldDef
+            }
+          }
+
           triggers.push({
             id: tid,
-            outputs: trig?.outputs || {},
-            configFields: trig?.configFields || {},
+            outputs: trig.outputs || {},
+            configFields,
           })
         }
 
         const blockInputs = computeBlockLevelInputs(blockConfig)
         const { commonParameters, operationParameters } = splitParametersByOperation(
-          Array.isArray(blockConfig.subBlocks) ? blockConfig.subBlocks : [],
+          Array.isArray(blockConfig.subBlocks)
+            ? blockConfig.subBlocks.filter((sb) => sb.mode !== 'trigger')
+            : [],
           blockInputs
         )
 
@@ -209,6 +254,7 @@ export const getBlocksMetadataServerTool: BaseServerTool<
           triggers,
           operationInputSchema: operationParameters,
           operations,
+          outputs: blockConfig.outputs,
         }
       }
 
@@ -236,20 +282,325 @@ export const getBlocksMetadataServerTool: BaseServerTool<
       }
     }
 
-    return GetBlocksMetadataResult.parse({ metadata: result })
+    const transformedResult: Record<string, any> = {}
+    for (const [blockId, metadata] of Object.entries(result)) {
+      transformedResult[blockId] = transformBlockMetadata(metadata)
+    }
+
+    return GetBlocksMetadataResult.parse({ metadata: transformedResult })
   },
 }
 
+function transformBlockMetadata(metadata: CopilotBlockMetadata): any {
+  const transformed: any = {
+    blockType: metadata.id,
+    name: metadata.name,
+    description: metadata.description,
+  }
+
+  if (metadata.bestPractices) {
+    transformed.bestPractices = metadata.bestPractices
+  }
+
+  if (metadata.authType) {
+    transformed.authType = metadata.authType
+
+    if (metadata.authType === 'OAuth') {
+      transformed.requiredCredentials = {
+        type: 'oauth',
+        service: metadata.id, // e.g., 'gmail', 'slack', etc.
+        description: `OAuth authentication required for ${metadata.name}`,
+      }
+    } else if (metadata.authType === 'API Key') {
+      transformed.requiredCredentials = {
+        type: 'api_key',
+        description: `API key required for ${metadata.name}`,
+      }
+    } else if (metadata.authType === 'Bot Token') {
+      transformed.requiredCredentials = {
+        type: 'bot_token',
+        description: `Bot token required for ${metadata.name}`,
+      }
+    }
+  }
+
+  const inputs = extractInputs(metadata)
+  if (inputs.required.length > 0 || inputs.optional.length > 0) {
+    transformed.inputs = inputs
+  }
+
+  const hasOperations = metadata.operations && Object.keys(metadata.operations).length > 0
+  if (hasOperations && metadata.operations) {
+    const blockLevelInputs = new Set(Object.keys(metadata.inputDefinitions || {}))
+    transformed.operations = Object.entries(metadata.operations).reduce(
+      (acc, [opId, opData]) => {
+        acc[opId] = {
+          name: opData.toolName || opId,
+          description: opData.description,
+          inputs: extractOperationInputs(opData, blockLevelInputs),
+          outputs: formatOutputsFromDefinition(opData.outputs || {}),
+        }
+        return acc
+      },
+      {} as Record<string, any>
+    )
+  }
+
+  if (!hasOperations) {
+    const outputs = extractOutputs(metadata)
+    if (outputs.length > 0) {
+      transformed.outputs = outputs
+    }
+  }
+
+  if (metadata.triggers && metadata.triggers.length > 0) {
+    transformed.triggers = metadata.triggers.map((t) => ({
+      id: t.id,
+      outputs: formatOutputsFromDefinition(t.outputs || {}),
+      configFields: t.configFields || {},
+    }))
+  }
+
+  if (metadata.yamlDocumentation) {
+    transformed.yamlDocumentation = metadata.yamlDocumentation
+  }
+
+  return transformed
+}
+
+function extractInputs(metadata: CopilotBlockMetadata): {
+  required: any[]
+  optional: any[]
+} {
+  const required: any[] = []
+  const optional: any[] = []
+  const inputDefs = metadata.inputDefinitions || {}
+
+  for (const schema of metadata.inputSchema || []) {
+    // Skip trigger subBlocks - they're handled separately in triggers.configFields
+    if (schema.mode === 'trigger') {
+      continue
+    }
+
+    if (
+      schema.type === 'oauth-credential' ||
+      schema.type === 'credential-input' ||
+      schema.type === 'oauth-input'
+    ) {
+      continue
+    }
+
+    if (schema.id === 'triggerConfig' || schema.type === 'trigger-config') {
+      continue
+    }
+
+    const inputDef = inputDefs[schema.id] || inputDefs[schema.canonicalParamId || '']
+
+    let description = schema.description || inputDef?.description || schema.title
+    if (schema.id === 'operation') {
+      description = 'Operation to perform'
+    }
+
+    const input: any = {
+      name: schema.id,
+      type: mapSchemaTypeToSimpleType(schema.type, schema),
+      description,
+    }
+
+    if (schema.options && schema.options.length > 0) {
+      if (schema.id === 'operation') {
+        input.options = schema.options.map((opt) => opt.id)
+      } else {
+        input.options = schema.options.map((opt) => opt.label || opt.id)
+      }
+    }
+
+    if (inputDef?.enum && Array.isArray(inputDef.enum)) {
+      input.options = inputDef.enum
+    }
+
+    if (schema.defaultValue !== undefined) {
+      input.default = schema.defaultValue
+    } else if (inputDef?.default !== undefined) {
+      input.default = inputDef.default
+    }
+
+    if (schema.type === 'slider' || schema.type === 'number-input') {
+      if (schema.min !== undefined) input.min = schema.min
+      if (schema.max !== undefined) input.max = schema.max
+    } else if (inputDef?.minimum !== undefined || inputDef?.maximum !== undefined) {
+      if (inputDef.minimum !== undefined) input.min = inputDef.minimum
+      if (inputDef.maximum !== undefined) input.max = inputDef.maximum
+    }
+
+    const example = generateInputExample(schema, inputDef)
+    if (example !== undefined) {
+      input.example = example
+    }
+
+    const isOperationField =
+      schema.id === 'operation' &&
+      metadata.operations &&
+      Object.keys(metadata.operations).length > 0
+    const isRequired = schema.required || inputDef?.required || isOperationField
+
+    if (isRequired) {
+      required.push(input)
+    } else {
+      optional.push(input)
+    }
+  }
+
+  return { required, optional }
+}
+
+function extractOperationInputs(
+  opData: any,
+  blockLevelInputs: Set<string>
+): {
+  required: any[]
+  optional: any[]
+} {
+  const required: any[] = []
+  const optional: any[] = []
+  const inputs = opData.inputs || {}
+
+  for (const [key, inputDef] of Object.entries(inputs)) {
+    if (blockLevelInputs.has(key)) {
+      continue
+    }
+
+    const lowerKey = key.toLowerCase()
+    if (
+      lowerKey.includes('token') ||
+      lowerKey.includes('credential') ||
+      lowerKey.includes('apikey')
+    ) {
+      continue
+    }
+
+    const input: any = {
+      name: key,
+      type: (inputDef as any)?.type || 'string',
+      description: (inputDef as any)?.description,
+    }
+
+    if ((inputDef as any)?.enum) {
+      input.options = (inputDef as any).enum
+    }
+
+    if ((inputDef as any)?.default !== undefined) {
+      input.default = (inputDef as any).default
+    }
+
+    if ((inputDef as any)?.example !== undefined) {
+      input.example = (inputDef as any).example
+    }
+
+    if ((inputDef as any)?.required) {
+      required.push(input)
+    } else {
+      optional.push(input)
+    }
+  }
+
+  return { required, optional }
+}
+
+function extractOutputs(metadata: CopilotBlockMetadata): any[] {
+  const outputs: any[] = []
+
+  if (metadata.outputs && Object.keys(metadata.outputs).length > 0) {
+    return formatOutputsFromDefinition(metadata.outputs)
+  }
+
+  if (metadata.operations && Object.keys(metadata.operations).length > 0) {
+    const firstOp = Object.values(metadata.operations)[0]
+    return formatOutputsFromDefinition(firstOp.outputs || {})
+  }
+
+  return outputs
+}
+
+function formatOutputsFromDefinition(outputDefs: Record<string, any>): any[] {
+  const outputs: any[] = []
+
+  for (const [key, def] of Object.entries(outputDefs)) {
+    const output: any = {
+      name: key,
+      type: typeof def === 'string' ? def : def?.type || 'any',
+    }
+
+    if (typeof def === 'object') {
+      if (def.description) output.description = def.description
+      if (def.example) output.example = def.example
+    }
+
+    outputs.push(output)
+  }
+
+  return outputs
+}
+
+function mapSchemaTypeToSimpleType(schemaType: string, schema: CopilotSubblockMetadata): string {
+  const typeMap: Record<string, string> = {
+    'short-input': 'string',
+    'long-input': 'string',
+    'code-input': 'string',
+    'number-input': 'number',
+    slider: 'number',
+    dropdown: 'string',
+    combobox: 'string',
+    toggle: 'boolean',
+    'json-input': 'json',
+    'file-upload': 'file',
+    'multi-select': 'array',
+    'credential-input': 'credential',
+    'oauth-credential': 'credential',
+  }
+
+  const mappedType = typeMap[schemaType] || schemaType
+
+  if (schema.multiSelect) return 'array'
+
+  return mappedType
+}
+
+function generateInputExample(schema: CopilotSubblockMetadata, inputDef?: any): any {
+  if (inputDef?.example !== undefined) return inputDef.example
+
+  switch (schema.type) {
+    case 'short-input':
+    case 'long-input':
+      if (schema.id === 'systemPrompt') return 'You are a helpful assistant...'
+      if (schema.id === 'userPrompt') return 'What is the weather today?'
+      if (schema.placeholder) return schema.placeholder
+      return undefined
+    case 'number-input':
+    case 'slider':
+      return schema.defaultValue ?? schema.min ?? 0
+    case 'toggle':
+      return schema.defaultValue ?? false
+    case 'json-input':
+      return schema.defaultValue ?? {}
+    case 'dropdown':
+    case 'combobox':
+      if (schema.options && schema.options.length > 0) {
+        return schema.options[0].id
+      }
+      return undefined
+    default:
+      return undefined
+  }
+}
+
 function processSubBlock(sb: any): CopilotSubblockMetadata {
-  // Start with required fields
   const processed: CopilotSubblockMetadata = {
     id: sb.id,
     type: sb.type,
   }
 
-  // Process all optional fields - only add if they exist and are not null/undefined
   const optionalFields = {
-    // Basic properties
     title: sb.title,
     required: sb.required,
     description: sb.description,
@@ -336,7 +687,6 @@ function resolveSubblockOptions(
   sb: any
 ): { id: string; label?: string; hasIcon?: boolean }[] | undefined {
   try {
-    // Resolve options if it's a function
     const rawOptions = typeof sb.options === 'function' ? sb.options() : sb.options
     if (!Array.isArray(rawOptions)) return undefined
 
@@ -344,7 +694,6 @@ function resolveSubblockOptions(
       .map((opt: any) => {
         if (!opt) return undefined
 
-        // Handle both string and object options
         const id = typeof opt === 'object' ? opt.id : opt
         if (id === undefined || id === null) return undefined
 
@@ -352,12 +701,10 @@ function resolveSubblockOptions(
           id: String(id),
         }
 
-        // Add label if present
         if (typeof opt === 'object' && typeof opt.label === 'string') {
           result.label = opt.label
         }
 
-        // Check for icon presence
         if (typeof opt === 'object' && opt.icon) {
           result.hasIcon = true
         }
@@ -440,9 +787,10 @@ function splitParametersByOperation(
 
 function computeBlockLevelInputs(blockConfig: BlockConfig): Record<string, any> {
   const inputs = blockConfig.inputs || {}
-  const subBlocks: any[] = Array.isArray(blockConfig.subBlocks) ? blockConfig.subBlocks : []
+  const subBlocks: any[] = Array.isArray(blockConfig.subBlocks)
+    ? blockConfig.subBlocks.filter((sb) => sb.mode !== 'trigger')
+    : []
 
-  // Build quick lookup of subBlocks by id and canonicalParamId
   const byParamKey: Record<string, any[]> = {}
   for (const sb of subBlocks) {
     if (sb.id) {
@@ -458,7 +806,6 @@ function computeBlockLevelInputs(blockConfig: BlockConfig): Record<string, any> 
   const blockInputs: Record<string, any> = {}
   for (const key of Object.keys(inputs)) {
     const sbs = byParamKey[key] || []
-    // If any related subBlock is gated by operation, treat as operation-level and exclude
     const isOperationGated = sbs.some((sb) => {
       const cond = normalizeCondition(sb.condition)
       return cond && cond.field === 'operation' && !cond.not && cond.value !== undefined
@@ -475,11 +822,12 @@ function computeOperationLevelInputs(
   blockConfig: BlockConfig
 ): Record<string, Record<string, any>> {
   const inputs = blockConfig.inputs || {}
-  const subBlocks = Array.isArray(blockConfig.subBlocks) ? blockConfig.subBlocks : []
+  const subBlocks = Array.isArray(blockConfig.subBlocks)
+    ? blockConfig.subBlocks.filter((sb) => sb.mode !== 'trigger')
+    : []
 
   const opInputs: Record<string, Record<string, any>> = {}
 
-  // Map subblocks to inputs keys via id or canonicalParamId and collect by operation
   for (const sb of subBlocks) {
     const cond = normalizeCondition(sb.condition)
     if (!cond || cond.field !== 'operation' || cond.not) continue
@@ -504,13 +852,11 @@ function resolveOperationIds(
   blockConfig: BlockConfig,
   operationParameters: Record<string, CopilotSubblockMetadata[]>
 ): string[] {
-  // Prefer explicit operation subblock options if present
   const opBlock = (blockConfig.subBlocks || []).find((sb) => sb.id === 'operation')
   if (opBlock && Array.isArray(opBlock.options)) {
     const ids = opBlock.options.map((o) => o.id).filter(Boolean)
     if (ids.length > 0) return ids
   }
-  // Fallback: keys from operationParameters
   return Object.keys(operationParameters)
 }
 
@@ -541,16 +887,48 @@ const SPECIAL_BLOCKS_METADATA: Record<string, any> = {
     - For yaml it needs to connect blocks inside to the start field of the block.
     `,
     inputs: {
-      loopType: { type: 'string', required: true, enum: ['for', 'forEach'] },
-      iterations: { type: 'number', required: false, minimum: 1, maximum: 1000 },
-      collection: { type: 'string', required: false },
-      maxConcurrency: { type: 'number', required: false, default: 1, minimum: 1, maximum: 10 },
+      loopType: {
+        type: 'string',
+        required: true,
+        enum: ['for', 'forEach', 'while', 'doWhile'],
+        description:
+          "Loop Type - 'for' runs N times, 'forEach' iterates over collection, 'while' runs while condition is true, 'doWhile' runs at least once then checks condition",
+      },
+      iterations: {
+        type: 'number',
+        required: false,
+        minimum: 1,
+        maximum: 1000,
+        description: "Number of iterations (for 'for' loopType)",
+        example: 5,
+      },
+      collection: {
+        type: 'string',
+        required: false,
+        description: "Collection to iterate over (for 'forEach' loopType)",
+        example: '<previousblock.items>',
+      },
+      condition: {
+        type: 'string',
+        required: false,
+        description: "Condition to evaluate (for 'while' and 'doWhile' loopType)",
+        example: '<loop.currentIteration> < 10',
+      },
+      maxConcurrency: {
+        type: 'number',
+        required: false,
+        default: 1,
+        minimum: 1,
+        maximum: 10,
+        description: 'Max parallel executions (1 = sequential)',
+        example: 1,
+      },
     },
     outputs: {
-      results: 'array',
-      currentIndex: 'number',
-      currentItem: 'any',
-      totalIterations: 'number',
+      results: { type: 'array', description: 'Array of results from each iteration' },
+      currentIndex: { type: 'number', description: 'Current iteration index (0-based)' },
+      currentItem: { type: 'any', description: 'Current item being iterated (for forEach loops)' },
+      totalIterations: { type: 'number', description: 'Total number of iterations' },
     },
     subBlocks: [
       {
@@ -561,6 +939,8 @@ const SPECIAL_BLOCKS_METADATA: Record<string, any> = {
         options: [
           { label: 'For Loop (count)', id: 'for' },
           { label: 'For Each (collection)', id: 'forEach' },
+          { label: 'While (condition)', id: 'while' },
+          { label: 'Do While (condition)', id: 'doWhile' },
         ],
       },
       {
@@ -578,6 +958,14 @@ const SPECIAL_BLOCKS_METADATA: Record<string, any> = {
         type: 'short-input',
         placeholder: 'Array or object to iterate over...',
         condition: { field: 'loopType', value: 'forEach' },
+      },
+      {
+        id: 'condition',
+        title: 'Condition',
+        type: 'code',
+        language: 'javascript',
+        placeholder: '<counter.value> < 10',
+        condition: { field: 'loopType', value: ['while', 'doWhile'] },
       },
       {
         id: 'maxConcurrency',
@@ -602,12 +990,45 @@ const SPECIAL_BLOCKS_METADATA: Record<string, any> = {
     - For yaml it needs to connect blocks inside to the start field of the block.
     `,
     inputs: {
-      parallelType: { type: 'string', required: true, enum: ['count', 'collection'] },
-      count: { type: 'number', required: false, minimum: 1, maximum: 100 },
-      collection: { type: 'string', required: false },
-      maxConcurrency: { type: 'number', required: false, default: 10, minimum: 1, maximum: 50 },
+      parallelType: {
+        type: 'string',
+        required: true,
+        enum: ['count', 'collection'],
+        description: "Parallel Type - 'count' runs N branches, 'collection' runs one per item",
+      },
+      count: {
+        type: 'number',
+        required: false,
+        minimum: 1,
+        maximum: 100,
+        description: "Number of parallel branches (for 'count' type)",
+        example: 3,
+      },
+      collection: {
+        type: 'string',
+        required: false,
+        description: "Collection to process in parallel (for 'collection' type)",
+        example: '<previousblock.items>',
+      },
+      maxConcurrency: {
+        type: 'number',
+        required: false,
+        default: 10,
+        minimum: 1,
+        maximum: 50,
+        description: 'Max concurrent executions at once',
+        example: 10,
+      },
     },
-    outputs: { results: 'array', branchId: 'number', branchItem: 'any', totalBranches: 'number' },
+    outputs: {
+      results: { type: 'array', description: 'Array of results from all parallel branches' },
+      branchId: { type: 'number', description: 'Current branch ID (0-based)' },
+      branchItem: {
+        type: 'any',
+        description: 'Current item for this branch (for collection type)',
+      },
+      totalBranches: { type: 'number', description: 'Total number of parallel branches' },
+    },
     subBlocks: [
       {
         id: 'parallelType',

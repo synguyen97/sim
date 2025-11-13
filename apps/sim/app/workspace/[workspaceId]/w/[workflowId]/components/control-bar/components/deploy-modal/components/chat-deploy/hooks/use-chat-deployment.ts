@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { z } from 'zod'
 import { createLogger } from '@/lib/logs/console/logger'
 import type { ChatFormData } from '@/app/workspace/[workspaceId]/w/[workflowId]/components/control-bar/components/deploy-modal/components/chat-deploy/hooks/use-chat-form'
-import type { OutputConfig } from '@/stores/panel/chat/types'
+import type { OutputConfig } from '@/stores/chat/store'
 
 const logger = createLogger('ChatDeployment')
 
@@ -72,7 +72,6 @@ export function useChatDeployment() {
           })
           .filter(Boolean) as OutputConfig[]
 
-        // Create request payload
         const payload = {
           workflowId,
           identifier: formData.identifier.trim(),
@@ -85,13 +84,13 @@ export function useChatDeployment() {
           },
           authType: formData.authType,
           password: formData.authType === 'password' ? formData.password : undefined,
-          allowedEmails: formData.authType === 'email' ? formData.emails : [],
+          allowedEmails:
+            formData.authType === 'email' || formData.authType === 'sso' ? formData.emails : [],
           outputConfigs,
           apiKey: deploymentInfo?.apiKey,
-          deployApiEnabled: !existingChatId, // Only deploy API for new chats
+          deployApiEnabled: !existingChatId,
         }
 
-        // Validate with Zod
         chatSchema.parse(payload)
 
         // Determine endpoint and method

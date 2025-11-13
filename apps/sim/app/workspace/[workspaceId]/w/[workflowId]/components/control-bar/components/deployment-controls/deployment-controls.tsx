@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2, Rocket } from 'lucide-react'
+import { Tooltip } from '@/components/emcn'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { DeployModal } from '@/app/workspace/[workspaceId]/w/[workflowId]/components/control-bar/components'
 import type { WorkspaceUserPermissions } from '@/hooks/use-user-permissions'
@@ -35,8 +35,9 @@ export function DeploymentControls({
   const isDeployed = deploymentStatus?.isDeployed || false
 
   const workflowNeedsRedeployment = needsRedeployment
+  const isPreviousVersionActive = isDeployed && workflowNeedsRedeployment
 
-  const [isDeploying, _setIsDeploying] = useState(false)
+  const [isDeploying, setIsDeploying] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const lastWorkflowIdRef = useRef<string | null>(null)
@@ -58,11 +59,52 @@ export function DeploymentControls({
   const canDeploy = userPermissions.canAdmin
   const isDisabled = isDeploying || !canDeploy
 
-  const handleDeployClick = useCallback(() => {
-    if (canDeploy) {
-      setIsModalOpen(true)
+  const handleDeployClick = useCallback(async () => {
+    if (!canDeploy || !activeWorkflowId) return
+
+    // If undeployed, deploy first then open modal
+    if (!isDeployed) {
+      setIsDeploying(true)
+      try {
+        const response = await fetch(`/api/workflows/${activeWorkflowId}/deploy`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            deployChatEnabled: false,
+          }),
+        })
+
+        if (response.ok) {
+          const responseData = await response.json()
+          const setDeploymentStatus = useWorkflowRegistry.getState().setDeploymentStatus
+          const isDeployedStatus = responseData.isDeployed ?? false
+          const deployedAtTime = responseData.deployedAt
+            ? new Date(responseData.deployedAt)
+            : undefined
+          setDeploymentStatus(
+            activeWorkflowId,
+            isDeployedStatus,
+            deployedAtTime,
+            responseData.apiKey || ''
+          )
+          await refetchWithErrorHandling()
+          // Open modal after successful deployment
+          setIsModalOpen(true)
+        }
+      } catch (error) {
+        // On error, still open modal to show error
+        setIsModalOpen(true)
+      } finally {
+        setIsDeploying(false)
+      }
+      return
     }
-  }, [canDeploy, setIsModalOpen])
+
+    // If already deployed, just open modal
+    setIsModalOpen(true)
+  }, [canDeploy, isDeployed, activeWorkflowId, refetchWithErrorHandling])
 
   const getTooltipText = () => {
     if (!canDeploy) {
@@ -82,8 +124,8 @@ export function DeploymentControls({
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
           <div className='relative'>
             <Button
               variant='outline'
@@ -93,7 +135,9 @@ export function DeploymentControls({
                 'h-12 w-12 rounded-[11px] border-[hsl(var(--card-border))] bg-[hsl(var(--card-background))] text-[hsl(var(--card-text))] shadow-xs',
                 'hover:border-[#ff9100] hover:bg-[#ff9100] hover:text-white',
                 'transition-all duration-200',
-                isDeployed && 'text-[#c56200]',
+                isDeployed && !isPreviousVersionActive && 'text-[var(--brand-primary-hover-hex)]',
+                isPreviousVersionActive &&
+                  'border-purple-500 bg-purple-500/10 text-purple-600 dark:text-purple-400',
                 isDisabled &&
                   'cursor-not-allowed opacity-50 hover:border hover:bg-card hover:text-card-foreground hover:shadow-xs'
               )}
@@ -116,9 +160,9 @@ export function DeploymentControls({
               </div>
             )}
           </div>
-        </TooltipTrigger>
-        <TooltipContent>{getTooltipText()}</TooltipContent>
-      </Tooltip>
+        </Tooltip.Trigger>
+        <Tooltip.Content>{getTooltipText()}</Tooltip.Content>
+      </Tooltip.Root>
 
       <DeployModal
         open={isModalOpen}

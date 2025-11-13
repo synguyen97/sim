@@ -3,7 +3,6 @@ import { isHosted } from '@/lib/environment'
 import { AuthMode, type BlockConfig } from '@/blocks/types'
 import {
   getAllModelProviders,
-  getBaseModelProviders,
   getHostedModels,
   getProviderIcon,
   providers,
@@ -40,7 +39,6 @@ export const TranslateBlock: BlockConfig = {
       id: 'context',
       title: 'Text to Translate',
       type: 'long-input',
-      layout: 'full',
       placeholder: 'Enter the text you want to translate',
       required: true,
     },
@@ -48,7 +46,6 @@ export const TranslateBlock: BlockConfig = {
       id: 'targetLanguage',
       title: 'Translate To',
       type: 'short-input',
-      layout: 'full',
       placeholder: 'Enter language (e.g. Spanish, French, etc.)',
       required: true,
     },
@@ -56,14 +53,13 @@ export const TranslateBlock: BlockConfig = {
       id: 'model',
       title: 'Model',
       type: 'combobox',
-      layout: 'half',
       placeholder: 'Type or select a model...',
       required: true,
       options: () => {
         const providersState = useProvidersStore.getState()
+        const baseModels = providersState.providers.base.models
         const ollamaModels = providersState.providers.ollama.models
         const openrouterModels = providersState.providers.openrouter.models
-        const baseModels = Object.keys(getBaseModelProviders())
         const allModels = Array.from(new Set([...baseModels, ...ollamaModels, ...openrouterModels]))
 
         return allModels.map((model) => {
@@ -76,7 +72,6 @@ export const TranslateBlock: BlockConfig = {
       id: 'apiKey',
       title: 'API Key',
       type: 'short-input',
-      layout: 'full',
       placeholder: 'Enter your API key',
       password: true,
       connectionDroppable: false,
@@ -98,7 +93,6 @@ export const TranslateBlock: BlockConfig = {
       id: 'azureEndpoint',
       title: 'Azure OpenAI Endpoint',
       type: 'short-input',
-      layout: 'full',
       password: true,
       placeholder: 'https://your-resource.openai.azure.com',
       connectionDroppable: false,
@@ -111,7 +105,6 @@ export const TranslateBlock: BlockConfig = {
       id: 'azureApiVersion',
       title: 'Azure API Version',
       type: 'short-input',
-      layout: 'full',
       placeholder: '2024-07-01-preview',
       connectionDroppable: false,
       condition: {
@@ -123,7 +116,6 @@ export const TranslateBlock: BlockConfig = {
       id: 'systemPrompt',
       title: 'System Prompt',
       type: 'code',
-      layout: 'full',
       hidden: true,
       value: (params: Record<string, any>) => {
         return getTranslationPrompt(params.targetLanguage || 'English')

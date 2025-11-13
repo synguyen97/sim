@@ -11,7 +11,7 @@ export const ResponseBlock: BlockConfig<ResponseBlockOutput> = {
   docsLink: 'https://docs.sim.ai/blocks/response',
   bestPractices: `
   - Only use this if the trigger block is the API Trigger.
-  - Prefer the editor mode over the builder mode.
+  - Prefer the builder mode over the editor mode.
   - This is usually used as the last block in the workflow.
   `,
   category: 'blocks',
@@ -22,7 +22,6 @@ export const ResponseBlock: BlockConfig<ResponseBlockOutput> = {
       id: 'dataMode',
       title: 'Response Data Mode',
       type: 'dropdown',
-      layout: 'full',
       options: [
         { label: 'Builder', id: 'structured' },
         { label: 'Editor', id: 'json' },
@@ -34,7 +33,6 @@ export const ResponseBlock: BlockConfig<ResponseBlockOutput> = {
       id: 'builderData',
       title: 'Response Structure',
       type: 'response-format',
-      layout: 'full',
       condition: { field: 'dataMode', value: 'structured' },
       description:
         'Define the structure of your response data. Use <variable.name> in field names to reference workflow variables.',
@@ -43,7 +41,6 @@ export const ResponseBlock: BlockConfig<ResponseBlockOutput> = {
       id: 'data',
       title: 'Response Data',
       type: 'code',
-      layout: 'full',
       placeholder: '{\n  "message": "Hello world",\n  "userId": "<variable.userId>"\n}',
       language: 'json',
       condition: { field: 'dataMode', value: 'json' },
@@ -78,7 +75,6 @@ Example:
       id: 'status',
       title: 'Status Code',
       type: 'short-input',
-      layout: 'half',
       placeholder: '200',
       description: 'HTTP status code (default: 200)',
     },
@@ -86,7 +82,6 @@ Example:
       id: 'headers',
       title: 'Response Headers',
       type: 'table',
-      layout: 'full',
       columns: ['Key', 'Value'],
       description: 'Additional HTTP headers to include in the response',
     },

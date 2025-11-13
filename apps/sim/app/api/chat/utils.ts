@@ -6,8 +6,6 @@ import { isDev } from '@/lib/environment'
 import { createLogger } from '@/lib/logs/console/logger'
 import { hasAdminPermission } from '@/lib/permissions/utils'
 import { decryptSecret } from '@/lib/utils'
-import { uploadExecutionFile } from '@/lib/workflows/execution-file-storage'
-import type { UserFile } from '@/executor/types'
 
 const logger = createLogger('ChatAuthUtils')
 
@@ -19,7 +17,6 @@ export async function checkWorkflowAccessForChatCreation(
   workflowId: string,
   userId: string
 ): Promise<{ hasAccess: boolean; workflow?: any }> {
-  // Get workflow data
   const workflowData = await db.select().from(workflow).where(eq(workflow.id, workflowId)).limit(1)
 
   if (workflowData.length === 0) {
@@ -28,12 +25,10 @@ export async function checkWorkflowAccessForChatCreation(
 
   const workflowRecord = workflowData[0]
 
-  // Case 1: User owns the workflow directly
   if (workflowRecord.userId === userId) {
     return { hasAccess: true, workflow: workflowRecord }
   }
 
-  // Case 2: Workflow belongs to a workspace and user has admin permission
   if (workflowRecord.workspaceId) {
     const hasAdmin = await hasAdminPermission(userId, workflowRecord.workspaceId)
     if (hasAdmin) {
@@ -52,7 +47,6 @@ export async function checkChatAccess(
   chatId: string,
   userId: string
 ): Promise<{ hasAccess: boolean; chat?: any }> {
-  // Get chat with workflow information
   const chatData = await db
     .select({
       chat: chat,
@@ -69,12 +63,10 @@ export async function checkChatAccess(
 
   const { chat: chatRecord, workflowWorkspaceId } = chatData[0]
 
-  // Case 1: User owns the chat directly
   if (chatRecord.userId === userId) {
     return { hasAccess: true, chat: chatRecord }
   }
 
-  // Case 2: Chat's workflow belongs to a workspace and user has admin permission
   if (workflowWorkspaceId) {
     const hasAdmin = await hasAdminPermission(userId, workflowWorkspaceId)
     if (hasAdmin) {
@@ -94,12 +86,10 @@ export const validateAuthToken = (token: string, chatId: string): boolean => {
     const decoded = Buffer.from(token, 'base64').toString()
     const [storedId, _type, timestamp] = decoded.split(':')
 
-    // Check if token is for this chat
     if (storedId !== chatId) {
       return false
     }
 
-    // Check if token is not expired (24 hours)
     const createdAt = Number.parseInt(timestamp)
     const now = Date.now()
     const expireTime = 24 * 60 * 60 * 1000 // 24 hours
@@ -117,7 +107,6 @@ export const validateAuthToken = (token: string, chatId: string): boolean => {
 // Set cookie helper function
 export const setChatAuthCookie = (response: NextResponse, chatId: string, type: string): void => {
   const token = encryptAuthToken(chatId, type)
-  // Set cookie with HttpOnly and secure flags
   response.cookies.set({
     name: `chat_auth_${chatId}`,
     value: token,
@@ -131,10 +120,8 @@ export const setChatAuthCookie = (response: NextResponse, chatId: string, type: 
 
 // Helper function to add CORS headers to responses
 export function addCorsHeaders(response: NextResponse, request: NextRequest) {
-  // Get the origin from the request
   const origin = request.headers.get('origin') || ''
 
-  // In development, allow any localhost subdomain
   if (isDev && origin.includes('localhost')) {
     response.headers.set('Access-Control-Allow-Origin', origin)
     response.headers.set('Access-Control-Allow-Credentials', 'true')
@@ -145,7 +132,6 @@ export function addCorsHeaders(response: NextResponse, request: NextRequest) {
   return response
 }
 
-// Handle OPTIONS requests for CORS preflight
 export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 204 })
   return addCorsHeaders(response, request)
@@ -181,14 +167,12 @@ export async function validateChatAuth(
     }
 
     try {
-      // Use the parsed body if provided, otherwise the auth check is not applicable
       if (!parsedBody) {
         return { authorized: false, error: 'Password is required' }
       }
 
       const { password, input } = parsedBody
 
-      // If this is a chat message, not an auth attempt
       if (input && !password) {
         return { authorized: false, error: 'auth_required_password' }
       }
@@ -202,7 +186,6 @@ export async function validateChatAuth(
         return { authorized: false, error: 'Authentication configuration error' }
       }
 
-      // Decrypt the stored password and compare
       const { decrypted } = await decryptSecret(deployment.password)
       if (password !== decrypted) {
         return { authorized: false, error: 'Invalid password' }
@@ -262,64 +245,66 @@ export async function validateChatAuth(
     }
   }
 
-  // Unknown auth type
-  return { authorized: false, error: 'Unsupported authentication type' }
-}
+  if (authType === 'sso') {
+    if (request.method === 'GET') {
+      return { authorized: false, error: 'auth_required_sso' }
+    }
 
-/**
- * Process and upload chat files to execution storage
- * Handles both base64 dataUrl format and direct URL pass-through
- */
-export async function processChatFiles(
-  files: Array<{ dataUrl?: string; url?: string; name: string; type: string }>,
-  executionContext: { workspaceId: string; workflowId: string; executionId: string },
-  requestId: string
-): Promise<UserFile[]> {
-  const uploadedFiles: UserFile[] = []
-
-  for (const file of files) {
     try {
-      if (file.dataUrl) {
-        const dataUrlPrefix = 'data:'
-        const base64Prefix = ';base64,'
-
-        if (!file.dataUrl.startsWith(dataUrlPrefix)) {
-          logger.warn(`[${requestId}] Invalid dataUrl format for file: ${file.name}`)
-          continue
-        }
-
-        const base64Index = file.dataUrl.indexOf(base64Prefix)
-        if (base64Index === -1) {
-          logger.warn(
-            `[${requestId}] Invalid dataUrl format (no base64 marker) for file: ${file.name}`
-          )
-          continue
-        }
-
-        const mimeType = file.dataUrl.substring(dataUrlPrefix.length, base64Index)
-        const base64Data = file.dataUrl.substring(base64Index + base64Prefix.length)
-        const buffer = Buffer.from(base64Data, 'base64')
-
-        logger.debug(`[${requestId}] Uploading file to S3: ${file.name} (${buffer.length} bytes)`)
-
-        const userFile = await uploadExecutionFile(
-          executionContext,
-          buffer,
-          file.name,
-          mimeType || file.type
-        )
-
-        uploadedFiles.push(userFile)
-        logger.debug(`[${requestId}] Successfully uploaded ${file.name} with URL: ${userFile.url}`)
-      } else if (file.url) {
-        uploadedFiles.push(file as UserFile)
-        logger.debug(`[${requestId}] Using existing URL for file: ${file.name}`)
+      if (!parsedBody) {
+        return { authorized: false, error: 'SSO authentication is required' }
       }
+
+      const { email, input, checkSSOAccess } = parsedBody
+
+      if (checkSSOAccess) {
+        if (!email) {
+          return { authorized: false, error: 'Email is required' }
+        }
+
+        const allowedEmails = deployment.allowedEmails || []
+
+        if (allowedEmails.includes(email)) {
+          return { authorized: true }
+        }
+
+        const domain = email.split('@')[1]
+        if (domain && allowedEmails.some((allowed: string) => allowed === `@${domain}`)) {
+          return { authorized: true }
+        }
+
+        return { authorized: false, error: 'Email not authorized for SSO access' }
+      }
+
+      const { auth } = await import('@/lib/auth')
+      const session = await auth.api.getSession({ headers: request.headers })
+
+      if (!session || !session.user) {
+        return { authorized: false, error: 'auth_required_sso' }
+      }
+
+      const userEmail = session.user.email
+      if (!userEmail) {
+        return { authorized: false, error: 'SSO session does not contain email' }
+      }
+
+      const allowedEmails = deployment.allowedEmails || []
+
+      if (allowedEmails.includes(userEmail)) {
+        return { authorized: true }
+      }
+
+      const domain = userEmail.split('@')[1]
+      if (domain && allowedEmails.some((allowed: string) => allowed === `@${domain}`)) {
+        return { authorized: true }
+      }
+
+      return { authorized: false, error: 'Your email is not authorized to access this chat' }
     } catch (error) {
-      logger.error(`[${requestId}] Failed to process file ${file.name}:`, error)
-      throw new Error(`Failed to upload file: ${file.name}`)
+      logger.error(`[${requestId}] Error validating SSO:`, error)
+      return { authorized: false, error: 'SSO authentication error' }
     }
   }
 
-  return uploadedFiles
+  return { authorized: false, error: 'Unsupported authentication type' }
 }

@@ -2,6 +2,7 @@ import type { SVGProps } from 'react'
 import { createElement } from 'react'
 import { Webhook } from 'lucide-react'
 import type { BlockConfig } from '@/blocks/types'
+import { getTrigger } from '@/triggers'
 
 const WebhookIcon = (props: SVGProps<SVGSVGElement>) => createElement(Webhook, props)
 
@@ -18,17 +19,7 @@ export const GenericWebhookBlock: BlockConfig = {
   - Continuing example above, the body can be accessed in downstream block using dot notation. E.g. <webhook1.message> and <webhook1.data.key>
   - Only use when there's no existing integration for the service with triggerAllowed flag set to true.
   `,
-  subBlocks: [
-    // Generic webhook configuration - always visible
-    {
-      id: 'triggerConfig',
-      title: 'Webhook Configuration',
-      type: 'trigger-config',
-      layout: 'full',
-      triggerProvider: 'generic',
-      availableTriggers: ['generic_webhook'],
-    },
-  ],
+  subBlocks: [...getTrigger('generic_webhook').subBlocks],
 
   tools: {
     access: [], // No external tools needed for triggers

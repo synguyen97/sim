@@ -1,5 +1,4 @@
 import { readFile } from 'fs/promises'
-import pdfParse from 'pdf-parse'
 import type { FileParseResult, FileParser } from '@/lib/file-parsers/types'
 import { createLogger } from '@/lib/logs/console/logger'
 
@@ -29,21 +28,28 @@ export class PdfParser implements FileParser {
     try {
       logger.info('Starting to parse buffer, size:', dataBuffer.length)
 
-      const pdfData = await pdfParse(dataBuffer)
+      const { PDFParse } = await import('pdf-parse')
+
+      const parser = new PDFParse({ data: dataBuffer })
+      const textResult = await parser.getText()
+      const infoResult = await parser.getInfo()
+      await parser.destroy()
 
       logger.info(
         'PDF parsed successfully, pages:',
-        pdfData.numpages,
+        textResult.total,
         'text length:',
-        pdfData.text.length
+        textResult.text.length
       )
 
+      const cleanContent = textResult.text.replace(/\u0000/g, '')
+
       return {
-        content: pdfData.text,
+        content: cleanContent,
         metadata: {
-          pageCount: pdfData.numpages,
-          info: pdfData.info,
-          version: pdfData.version,
+          pageCount: textResult.total,
+          info: infoResult.info,
+          version: infoResult.metadata?.get('pdf:PDFVersion'),
           source: 'pdf-parse',
         },
       }

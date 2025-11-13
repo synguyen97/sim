@@ -9,29 +9,22 @@ import { getEnv, isTruthy } from '@/lib/env'
 import { createLogger } from '@/lib/logs/console/logger'
 import { generateWorkspaceName } from '@/lib/naming'
 import { useUserPermissionsContext } from '@/app/workspace/[workspaceId]/providers/workspace-permissions-provider'
-import { SearchModal } from '@/app/workspace/[workspaceId]/w/components/search-modal/search-modal'
 import {
   CreateMenu,
   FloatingNavigation,
   FolderTree,
   HelpModal,
-  KeyboardShortcut,
   KnowledgeBaseTags,
   KnowledgeTags,
   LogsFilters,
   SettingsModal,
   SubscriptionModal,
-  Toolbar,
   UsageIndicator,
   WorkspaceHeader,
   WorkspaceSelector,
 } from '@/app/workspace/[workspaceId]/w/components/sidebar/components'
-import { InviteModal } from '@/app/workspace/[workspaceId]/w/components/sidebar/components/workspace-selector/components/invite-modal/invite-modal'
-import { useAutoScroll } from '@/app/workspace/[workspaceId]/w/hooks/use-auto-scroll'
-import {
-  getKeyboardShortcutText,
-  useGlobalShortcuts,
-} from '@/app/workspace/[workspaceId]/w/hooks/use-keyboard-shortcuts'
+import { InviteModal } from '@/app/workspace/[workspaceId]/w/components/sidebar/components-new/workspace-header/components/invite-modal/invite-modal'
+import { useAutoScroll } from '@/app/workspace/[workspaceId]/w/components/sidebar/hooks/use-auto-scroll'
 import { useKnowledgeBasesList } from '@/hooks/use-knowledge'
 import { useSubscriptionStore } from '@/stores/subscription/store'
 import { useWorkflowDiffStore } from '@/stores/workflow-diff/store'
@@ -86,7 +79,7 @@ interface TemplateData {
 }
 
 export function Sidebar() {
-  useGlobalShortcuts()
+  // useGlobalShortcuts()
 
   const {
     workflows,
@@ -679,46 +672,34 @@ export function Sidebar() {
   const [showSearchModal, setShowSearchModal] = useState(false)
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
 
-  // Separate regular workflows from temporary marketplace workflows
-  const { regularWorkflows, tempWorkflows } = useMemo(() => {
+  // Get workflows for the current workspace
+  const regularWorkflows = useMemo(() => {
+    if (isLoading) return []
+
     const regular: WorkflowMetadata[] = []
-    const temp: WorkflowMetadata[] = []
-
-    if (!isLoading) {
-      Object.values(workflows).forEach((workflow) => {
-        if (workflow.workspaceId === workspaceId || !workflow.workspaceId) {
-          if (workflow.marketplaceData?.status === 'temp') {
-            temp.push(workflow)
-          } else {
-            regular.push(workflow)
-          }
-        }
-      })
-
-      // Sort by creation date (newest first) for stable ordering
-      const sortByCreatedAt = (a: WorkflowMetadata, b: WorkflowMetadata) => {
-        return b.createdAt.getTime() - a.createdAt.getTime()
+    Object.values(workflows).forEach((workflow) => {
+      if (workflow.workspaceId === workspaceId || !workflow.workspaceId) {
+        regular.push(workflow)
       }
+    })
 
-      regular.sort(sortByCreatedAt)
-      temp.sort(sortByCreatedAt)
-    }
+    // Sort by creation date (newest first) for stable ordering
+    regular.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
-    return { regularWorkflows: regular, tempWorkflows: temp }
+    return regular
   }, [workflows, isLoading, workspaceId])
 
   // Prepare workflows for search modal
   const searchWorkflows = useMemo(() => {
     if (isLoading) return []
 
-    const allWorkflows = [...regularWorkflows, ...tempWorkflows]
-    return allWorkflows.map((workflow) => ({
+    return regularWorkflows.map((workflow) => ({
       id: workflow.id,
       name: workflow.name,
       href: `/workspace/${workspaceId}/w/${workflow.id}`,
       isCurrent: workflow.id === workflowId,
     }))
-  }, [regularWorkflows, tempWorkflows, workspaceId, workflowId, isLoading])
+  }, [regularWorkflows, workspaceId, workflowId, isLoading])
 
   // Prepare workspaces for search modal (include all workspaces)
   const searchWorkspaces = useMemo(() => {
@@ -927,7 +908,7 @@ export function Sidebar() {
               <span className='flex h-8 flex-1 items-center px-0 text-muted-foreground text-sm leading-none'>
                 Search anything
               </span>
-              <KeyboardShortcut shortcut={getKeyboardShortcutText('K', true)} />
+              {/* <KeyboardShortcut shortcut={getKeyboardShortcutText('K', true)} /> */}
             </button>
           </div>
 
@@ -942,7 +923,6 @@ export function Sidebar() {
                 <div ref={workflowScrollAreaRef}>
                   <FolderTree
                     regularWorkflows={regularWorkflows}
-                    marketplaceWorkflows={tempWorkflows}
                     isLoading={isLoading}
                     onCreateWorkflow={handleCreateWorkflow}
                   />
@@ -970,12 +950,7 @@ export function Sidebar() {
           top: `${toolbarTop}px`,
           bottom: `${navigationBottom + SIDEBAR_HEIGHTS.NAVIGATION + SIDEBAR_GAP + (isBillingEnabled ? SIDEBAR_HEIGHTS.USAGE_INDICATOR + SIDEBAR_GAP : 0)}px`, // Navigation height + gap + UsageIndicator height + gap (if billing enabled)
         }}
-      >
-        <Toolbar
-          userPermissions={userPermissions}
-          isWorkspaceSelectorVisible={isWorkspaceSelectorVisible}
-        />
-      </div>
+      />
 
       {/* Floating Logs Filters - Only on logs page */}
       <div
@@ -1046,15 +1021,6 @@ export function Sidebar() {
       <HelpModal open={showHelp} onOpenChange={setShowHelp} />
       <InviteModal open={showInviteMembers} onOpenChange={setShowInviteMembers} />
       <SubscriptionModal open={showSubscriptionModal} onOpenChange={setShowSubscriptionModal} />
-
-      <SearchModal
-        open={showSearchModal}
-        onOpenChange={setShowSearchModal}
-        workflows={searchWorkflows}
-        workspaces={searchWorkspaces}
-        knowledgeBases={searchKnowledgeBases}
-        isOnWorkflowPage={isOnWorkflowPage}
-      />
     </>
   )
 }

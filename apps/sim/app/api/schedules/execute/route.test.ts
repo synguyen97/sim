@@ -3,280 +3,322 @@
  *
  * @vitest-environment node
  */
+import type { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  mockExecutionDependencies,
-  mockScheduleExecuteDb,
-  sampleWorkflowState,
-} from '@/app/api/__test-utils__/utils'
+
+function createMockRequest(): NextRequest {
+  const mockHeaders = new Map([
+    ['authorization', 'Bearer test-cron-secret'],
+    ['content-type', 'application/json'],
+  ])
+
+  return {
+    headers: {
+      get: (key: string) => mockHeaders.get(key.toLowerCase()) || null,
+    },
+    url: 'http://localhost:3000/api/schedules/execute',
+  } as NextRequest
+}
 
 describe('Scheduled Workflow Execution API Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.resetModules()
+  })
 
-    mockExecutionDependencies()
+  afterEach(() => {
+    vi.clearAllMocks()
+    vi.resetModules()
+  })
 
-    // Mock all dependencies
-    vi.doMock('@/services/queue', () => ({
-      RateLimiter: vi.fn().mockImplementation(() => ({
-        checkRateLimitWithSubscription: vi.fn().mockResolvedValue({
-          allowed: true,
-          remaining: 100,
-          resetAt: new Date(Date.now() + 60000),
-        }),
-      })),
+  it('should execute scheduled workflows with Trigger.dev disabled', async () => {
+    const mockExecuteScheduleJob = vi.fn().mockResolvedValue(undefined)
+
+    vi.doMock('@/lib/auth/internal', () => ({
+      verifyCronAuth: vi.fn().mockReturnValue(null),
     }))
 
-    vi.doMock('@/lib/billing', () => ({
-      checkServerSideUsageLimits: vi.fn().mockResolvedValue({ isExceeded: false }),
+    vi.doMock('@/background/schedule-execution', () => ({
+      executeScheduleJob: mockExecuteScheduleJob,
     }))
 
-    vi.doMock('@/lib/billing/core/subscription', () => ({
-      getHighestPrioritySubscription: vi.fn().mockResolvedValue({
-        plan: 'pro',
-        status: 'active',
-      }),
-    }))
-
-    vi.doMock('@/lib/environment/utils', () => ({
-      getPersonalAndWorkspaceEnv: vi.fn().mockResolvedValue({
-        personalEncrypted: {},
-        workspaceEncrypted: {},
-      }),
-    }))
-
-    vi.doMock('@/lib/logs/execution/logging-session', () => ({
-      LoggingSession: vi.fn().mockImplementation(() => ({
-        safeStart: vi.fn().mockResolvedValue(undefined),
-        safeComplete: vi.fn().mockResolvedValue(undefined),
-        safeCompleteWithError: vi.fn().mockResolvedValue(undefined),
-        setupExecutor: vi.fn(),
-      })),
-    }))
-
-    vi.doMock('@/lib/workflows/db-helpers', () => ({
-      loadDeployedWorkflowState: vi.fn().mockResolvedValue({
-        blocks: sampleWorkflowState.blocks,
-        edges: sampleWorkflowState.edges || [],
-        loops: sampleWorkflowState.loops || {},
-        parallels: sampleWorkflowState.parallels || {},
-      }),
-      loadWorkflowFromNormalizedTables: vi.fn().mockResolvedValue({
-        blocks: sampleWorkflowState.blocks,
-        edges: sampleWorkflowState.edges || [],
-        loops: sampleWorkflowState.loops || {},
-        parallels: {},
-        isFromNormalizedTables: true,
-      }),
-    }))
-
-    vi.doMock('@/stores/workflows/server-utils', () => ({
-      mergeSubblockState: vi.fn().mockReturnValue(sampleWorkflowState.blocks),
-    }))
-
-    vi.doMock('@/lib/schedules/utils', () => ({
-      calculateNextRunTime: vi.fn().mockReturnValue(new Date(Date.now() + 60000)),
-      getScheduleTimeValues: vi.fn().mockReturnValue({}),
-      getSubBlockValue: vi.fn().mockReturnValue('manual'),
+    vi.doMock('@/lib/env', () => ({
+      env: {
+        TRIGGER_DEV_ENABLED: false,
+      },
+      isTruthy: vi.fn(() => false),
     }))
 
     vi.doMock('drizzle-orm', () => ({
       and: vi.fn((...conditions) => ({ type: 'and', conditions })),
       eq: vi.fn((field, value) => ({ field, value, type: 'eq' })),
       lte: vi.fn((field, value) => ({ field, value, type: 'lte' })),
+      lt: vi.fn((field, value) => ({ field, value, type: 'lt' })),
       not: vi.fn((condition) => ({ type: 'not', condition })),
-      sql: vi.fn((strings, ...values) => ({ strings, values, type: 'sql' })),
-    }))
-
-    vi.doMock('croner', () => ({
-      Cron: vi.fn().mockImplementation(() => ({
-        nextRun: vi.fn().mockReturnValue(new Date(Date.now() + 60000)), // Next run in 1 minute
-      })),
+      isNull: vi.fn((field) => ({ type: 'isNull', field })),
+      or: vi.fn((...conditions) => ({ type: 'or', conditions })),
     }))
 
     vi.doMock('@sim/db', () => {
-      const mockDb = {
-        select: vi.fn().mockImplementation(() => ({
-          from: vi.fn().mockImplementation((_table: any) => ({
-            where: vi.fn().mockImplementation((_cond: any) => ({
-              limit: vi.fn().mockImplementation((n?: number) => {
-                // Always return empty array - no due schedules
-                return []
-              }),
-            })),
-          })),
-        })),
-        update: vi.fn().mockImplementation(() => ({
-          set: vi.fn().mockImplementation(() => ({
-            where: vi.fn().mockResolvedValue([]),
-          })),
-        })),
-      }
+      const returningSchedules = [
+        {
+          id: 'schedule-1',
+          workflowId: 'workflow-1',
+          blockId: null,
+          cronExpression: null,
+          lastRanAt: null,
+          failedCount: 0,
+          nextRunAt: new Date('2025-01-01T00:00:00.000Z'),
+          lastQueuedAt: undefined,
+        },
+      ]
+
+      const mockReturning = vi.fn().mockReturnValue(returningSchedules)
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning })
+      const mockSet = vi.fn().mockReturnValue({ where: mockWhere })
+      const mockUpdate = vi.fn().mockReturnValue({ set: mockSet })
 
       return {
-        db: mockDb,
-        userStats: {
-          userId: 'userId',
-          totalScheduledExecutions: 'totalScheduledExecutions',
-          lastActive: 'lastActive',
+        db: {
+          update: mockUpdate,
         },
-        workflow: { id: 'id', userId: 'userId', state: 'state' },
         workflowSchedule: {
           id: 'id',
           workflowId: 'workflowId',
-          nextRunAt: 'nextRunAt',
+          blockId: 'blockId',
+          cronExpression: 'cronExpression',
+          lastRanAt: 'lastRanAt',
+          failedCount: 'failedCount',
           status: 'status',
+          nextRunAt: 'nextRunAt',
+          lastQueuedAt: 'lastQueuedAt',
         },
       }
     })
+
+    const { GET } = await import('@/app/api/schedules/execute/route')
+    const response = await GET(createMockRequest())
+
+    expect(response).toBeDefined()
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data).toHaveProperty('message')
+    expect(data).toHaveProperty('executedCount', 1)
   })
 
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
+  it('should queue schedules to Trigger.dev when enabled', async () => {
+    const mockTrigger = vi.fn().mockResolvedValue({ id: 'task-id-123' })
 
-  it('should execute scheduled workflows successfully', async () => {
-    const executeMock = vi.fn().mockResolvedValue({
-      success: true,
-      output: { response: 'Scheduled execution completed' },
-      logs: [],
-      metadata: {
-        duration: 100,
-        startTime: new Date().toISOString(),
-        endTime: new Date().toISOString(),
+    vi.doMock('@/lib/auth/internal', () => ({
+      verifyCronAuth: vi.fn().mockReturnValue(null),
+    }))
+
+    vi.doMock('@trigger.dev/sdk', () => ({
+      tasks: {
+        trigger: mockTrigger,
       },
+    }))
+
+    vi.doMock('@/lib/env', () => ({
+      env: {
+        TRIGGER_DEV_ENABLED: true,
+      },
+      isTruthy: vi.fn(() => true),
+    }))
+
+    vi.doMock('drizzle-orm', () => ({
+      and: vi.fn((...conditions) => ({ type: 'and', conditions })),
+      eq: vi.fn((field, value) => ({ field, value, type: 'eq' })),
+      lte: vi.fn((field, value) => ({ field, value, type: 'lte' })),
+      lt: vi.fn((field, value) => ({ field, value, type: 'lt' })),
+      not: vi.fn((condition) => ({ type: 'not', condition })),
+      isNull: vi.fn((field) => ({ type: 'isNull', field })),
+      or: vi.fn((...conditions) => ({ type: 'or', conditions })),
+    }))
+
+    vi.doMock('@sim/db', () => {
+      const returningSchedules = [
+        {
+          id: 'schedule-1',
+          workflowId: 'workflow-1',
+          blockId: null,
+          cronExpression: null,
+          lastRanAt: null,
+          failedCount: 0,
+          nextRunAt: new Date('2025-01-01T00:00:00.000Z'),
+          lastQueuedAt: undefined,
+        },
+      ]
+
+      const mockReturning = vi.fn().mockReturnValue(returningSchedules)
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning })
+      const mockSet = vi.fn().mockReturnValue({ where: mockWhere })
+      const mockUpdate = vi.fn().mockReturnValue({ set: mockSet })
+
+      return {
+        db: {
+          update: mockUpdate,
+        },
+        workflowSchedule: {
+          id: 'id',
+          workflowId: 'workflowId',
+          blockId: 'blockId',
+          cronExpression: 'cronExpression',
+          lastRanAt: 'lastRanAt',
+          failedCount: 'failedCount',
+          status: 'status',
+          nextRunAt: 'nextRunAt',
+          lastQueuedAt: 'lastQueuedAt',
+        },
+      }
     })
 
-    vi.doMock('@/executor', () => ({
-      Executor: vi.fn().mockImplementation(() => ({
-        execute: executeMock,
-      })),
-    }))
-
     const { GET } = await import('@/app/api/schedules/execute/route')
-    const response = await GET()
-    expect(response).toBeDefined()
-
-    const data = await response.json()
-    expect(data).toHaveProperty('message')
-    expect(data).toHaveProperty('executedCount')
-  })
-
-  it('should handle errors during scheduled execution gracefully', async () => {
-    vi.doMock('@/executor', () => ({
-      Executor: vi.fn().mockImplementation(() => ({
-        execute: vi.fn().mockRejectedValue(new Error('Execution failed')),
-      })),
-    }))
-
-    const { GET } = await import('@/app/api/schedules/execute/route')
-    const response = await GET()
+    const response = await GET(createMockRequest())
 
     expect(response).toBeDefined()
-
+    expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toHaveProperty('message')
+    expect(data).toHaveProperty('executedCount', 1)
   })
 
   it('should handle case with no due schedules', async () => {
+    vi.doMock('@/lib/auth/internal', () => ({
+      verifyCronAuth: vi.fn().mockReturnValue(null),
+    }))
+
+    vi.doMock('@/background/schedule-execution', () => ({
+      executeScheduleJob: vi.fn().mockResolvedValue(undefined),
+    }))
+
+    vi.doMock('@/lib/env', () => ({
+      env: {
+        TRIGGER_DEV_ENABLED: false,
+      },
+      isTruthy: vi.fn(() => false),
+    }))
+
+    vi.doMock('drizzle-orm', () => ({
+      and: vi.fn((...conditions) => ({ type: 'and', conditions })),
+      eq: vi.fn((field, value) => ({ field, value, type: 'eq' })),
+      lte: vi.fn((field, value) => ({ field, value, type: 'lte' })),
+      lt: vi.fn((field, value) => ({ field, value, type: 'lt' })),
+      not: vi.fn((condition) => ({ type: 'not', condition })),
+      isNull: vi.fn((field) => ({ type: 'isNull', field })),
+      or: vi.fn((...conditions) => ({ type: 'or', conditions })),
+    }))
+
     vi.doMock('@sim/db', () => {
-      const mockDb = {
-        select: vi.fn().mockImplementation(() => ({
-          from: vi.fn().mockImplementation(() => ({
-            where: vi.fn().mockImplementation(() => ({
-              limit: vi.fn().mockImplementation(() => []),
-            })),
-          })),
-        })),
-        update: vi.fn().mockImplementation(() => ({
-          set: vi.fn().mockImplementation(() => ({
-            where: vi.fn().mockResolvedValue([]),
-          })),
-        })),
+      const mockReturning = vi.fn().mockReturnValue([])
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning })
+      const mockSet = vi.fn().mockReturnValue({ where: mockWhere })
+      const mockUpdate = vi.fn().mockReturnValue({ set: mockSet })
+
+      return {
+        db: {
+          update: mockUpdate,
+        },
+        workflowSchedule: {
+          id: 'id',
+          workflowId: 'workflowId',
+          blockId: 'blockId',
+          cronExpression: 'cronExpression',
+          lastRanAt: 'lastRanAt',
+          failedCount: 'failedCount',
+          status: 'status',
+          nextRunAt: 'nextRunAt',
+          lastQueuedAt: 'lastQueuedAt',
+        },
       }
-
-      return { db: mockDb }
     })
 
     const { GET } = await import('@/app/api/schedules/execute/route')
-    const response = await GET()
-    expect(response.status).toBe(200)
-    const data = await response.json()
-    expect(data).toHaveProperty('executedCount', 0)
-
-    const executeMock = vi.fn()
-    vi.doMock('@/executor', () => ({
-      Executor: vi.fn().mockImplementation(() => ({
-        execute: executeMock,
-      })),
-    }))
-
-    expect(executeMock).not.toHaveBeenCalled()
-  })
-
-  // Removed: Test isolation issues with mocks make this unreliable
-
-  it('should execute schedules that are explicitly marked as active', async () => {
-    const executeMock = vi.fn().mockResolvedValue({ success: true, metadata: {} })
-
-    vi.doMock('@/executor', () => ({
-      Executor: vi.fn().mockImplementation(() => ({
-        execute: executeMock,
-      })),
-    }))
-
-    mockScheduleExecuteDb({
-      schedules: [
-        {
-          id: 'schedule-active',
-          workflowId: 'workflow-id',
-          userId: 'user-id',
-          status: 'active',
-          nextRunAt: new Date(Date.now() - 60_000),
-          lastRanAt: null,
-          cronExpression: null,
-          failedCount: 0,
-        },
-      ],
-    })
-
-    const { GET } = await import('@/app/api/schedules/execute/route')
-    const response = await GET()
-
-    expect(response.status).toBe(200)
-  })
-
-  it('should not execute schedules that are disabled', async () => {
-    const executeMock = vi.fn()
-
-    vi.doMock('@/executor', () => ({
-      Executor: vi.fn().mockImplementation(() => ({
-        execute: executeMock,
-      })),
-    }))
-
-    mockScheduleExecuteDb({
-      schedules: [
-        {
-          id: 'schedule-disabled',
-          workflowId: 'workflow-id',
-          userId: 'user-id',
-          status: 'disabled',
-          nextRunAt: new Date(Date.now() - 60_000),
-          lastRanAt: null,
-          cronExpression: null,
-          failedCount: 0,
-        },
-      ],
-    })
-
-    const { GET } = await import('@/app/api/schedules/execute/route')
-    const response = await GET()
+    const response = await GET(createMockRequest())
 
     expect(response.status).toBe(200)
     const data = await response.json()
+    expect(data).toHaveProperty('message')
     expect(data).toHaveProperty('executedCount', 0)
+  })
 
-    expect(executeMock).not.toHaveBeenCalled()
+  it('should execute multiple schedules in parallel', async () => {
+    vi.doMock('@/lib/auth/internal', () => ({
+      verifyCronAuth: vi.fn().mockReturnValue(null),
+    }))
+
+    vi.doMock('@/background/schedule-execution', () => ({
+      executeScheduleJob: vi.fn().mockResolvedValue(undefined),
+    }))
+
+    vi.doMock('@/lib/env', () => ({
+      env: {
+        TRIGGER_DEV_ENABLED: false,
+      },
+      isTruthy: vi.fn(() => false),
+    }))
+
+    vi.doMock('drizzle-orm', () => ({
+      and: vi.fn((...conditions) => ({ type: 'and', conditions })),
+      eq: vi.fn((field, value) => ({ field, value, type: 'eq' })),
+      lte: vi.fn((field, value) => ({ field, value, type: 'lte' })),
+      lt: vi.fn((field, value) => ({ field, value, type: 'lt' })),
+      not: vi.fn((condition) => ({ type: 'not', condition })),
+      isNull: vi.fn((field) => ({ type: 'isNull', field })),
+      or: vi.fn((...conditions) => ({ type: 'or', conditions })),
+    }))
+
+    vi.doMock('@sim/db', () => {
+      const returningSchedules = [
+        {
+          id: 'schedule-1',
+          workflowId: 'workflow-1',
+          blockId: null,
+          cronExpression: null,
+          lastRanAt: null,
+          failedCount: 0,
+          nextRunAt: new Date('2025-01-01T00:00:00.000Z'),
+          lastQueuedAt: undefined,
+        },
+        {
+          id: 'schedule-2',
+          workflowId: 'workflow-2',
+          blockId: null,
+          cronExpression: null,
+          lastRanAt: null,
+          failedCount: 0,
+          nextRunAt: new Date('2025-01-01T01:00:00.000Z'),
+          lastQueuedAt: undefined,
+        },
+      ]
+
+      const mockReturning = vi.fn().mockReturnValue(returningSchedules)
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning })
+      const mockSet = vi.fn().mockReturnValue({ where: mockWhere })
+      const mockUpdate = vi.fn().mockReturnValue({ set: mockSet })
+
+      return {
+        db: {
+          update: mockUpdate,
+        },
+        workflowSchedule: {
+          id: 'id',
+          workflowId: 'workflowId',
+          blockId: 'blockId',
+          cronExpression: 'cronExpression',
+          lastRanAt: 'lastRanAt',
+          failedCount: 'failedCount',
+          status: 'status',
+          nextRunAt: 'nextRunAt',
+          lastQueuedAt: 'lastQueuedAt',
+        },
+      }
+    })
+
+    const { GET } = await import('@/app/api/schedules/execute/route')
+    const response = await GET(createMockRequest())
+
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data).toHaveProperty('executedCount', 2)
   })
 })
