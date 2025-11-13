@@ -240,23 +240,6 @@ const WorkflowContent = React.memo(() => {
     return edgesToFilter
   }, [edges, isShowingDiff, isDiffReady, diffAnalysis, blocks])
 
-  useEffect(() => {
-    const handleZoomHotkey = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && (event.key === '=' || event.key === '+')) {
-        event.preventDefault()
-        zoomIn?.()
-      }
-      if ((event.ctrlKey || event.metaKey) && event.key === '-') {
-        event.preventDefault()
-        zoomOut?.()
-      }
-    }
-
-    window.addEventListener('keydown', handleZoomHotkey)
-    return () => window.removeEventListener('keydown', handleZoomHotkey)
-  }, [zoomIn, zoomOut])
-
-
   // User permissions - get current user's specific permissions from context
   const userPermissions = useUserPermissionsContext()
 
