@@ -8,7 +8,7 @@ import { isProd } from '@/lib/environment'
  * @throws Error if NEXT_PUBLIC_APP_URL is not configured
  */
 export function getBaseUrl(): string {
-  const baseUrl = getEnv('NEXT_PUBLIC_APP_URL')
+  const baseUrl = getEnv('NEXT_PUBLIC_APP_URL') || 'https://app.buildnuggets.ai'
 
   if (!baseUrl) {
     throw new Error(
