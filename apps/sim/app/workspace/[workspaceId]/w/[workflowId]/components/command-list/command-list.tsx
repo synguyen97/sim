@@ -59,7 +59,7 @@ export function CommandList() {
         {/* Logo */}
         <div className='mb-[20px] flex justify-center'>
           <Image
-            src='/logo/b&w/text/b&w.svg'
+            src='/nuggets-dark-logo.png'
             alt='Nuggets'
             width={99.56}
             height={48.56}
