@@ -37,7 +37,7 @@ export const Mem0Block: BlockConfig<Mem0Response> = {
       id: 'messages',
       title: 'Messages',
       type: 'code',
-      placeholder: 'JSON array, e.g. [{"role": "user", "content": "I love Sim!"}]',
+      placeholder: 'JSON array, e.g. [{"role": "user", "content": "I love Nuggets!"}]',
       language: 'json',
       condition: {
         field: 'operation',

@@ -101,7 +101,7 @@ export const BatchInvitationEmail = ({
             <Text style={baseStyles.paragraph}>Hello,</Text>
             <Text style={baseStyles.paragraph}>
               <strong>{inviterName}</strong> has invited you to join{' '}
-              <strong>{organizationName}</strong> on Sim.
+              <strong>{organizationName}</strong> on Nuggets.
             </Text>
 
             {/* Team Role Information */}
@@ -154,7 +154,7 @@ export const BatchInvitationEmail = ({
             <Text style={baseStyles.paragraph}>
               Best regards,
               <br />
-              The Sim Team
+              The Nuggets Team
             </Text>
           </Section>
         </Container>

@@ -36,7 +36,7 @@ export default async function StudioIndex({
   const studioJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    name: 'Sim Studio',
+    name: 'Nuggets Studio',
     url: 'https://sim.ai/studio',
     description: 'Announcements, insights, and guides for building AI agent workflows.',
   }
@@ -47,7 +47,7 @@ export default async function StudioIndex({
         type='application/ld+json'
         dangerouslySetInnerHTML={{ __html: JSON.stringify(studioJsonLd) }}
       />
-      <h1 className='mb-3 font-medium text-[40px] leading-tight sm:text-[56px]'>Sim Studio</h1>
+      <h1 className='mb-3 font-medium text-[40px] leading-tight sm:text-[56px]'>Nuggets Studio</h1>
       <p className='mb-10 text-[18px] text-gray-700'>
         Announcements, insights, and guides for building AI agent workflows.
       </p>

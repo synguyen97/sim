@@ -79,7 +79,7 @@ export const EmailFooter = ({ baseUrl = getBaseUrl(), unsubscribe }: EmailFooter
                 {isHosted && (
                   <>
                     <br />
-                    Sim, 80 Langton St, San Francisco, CA 94133, USA
+                    Nuggets, 80 Langton St, San Francisco, CA 94133, USA
                   </>
                 )}
               </Text>

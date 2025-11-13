@@ -110,10 +110,10 @@ export default function Footer({ fullWidth = false }: FooterProps) {
         <div className={`flex gap-[80px] ${fullWidth ? 'justify-center' : ''}`}>
           {/* Logo and social links */}
           <div className='flex flex-col gap-[24px]'>
-            <Link href='/' aria-label='Sim home'>
+            <Link href='/' aria-label='Nuggets home'>
               <Image
                 src='/logo/b&w/text/b&w.svg'
-                alt='Sim - Workflows for LLMs'
+                alt='Nuggets - Workflows for LLMs'
                 width={49.78314}
                 height={24.276}
                 priority
@@ -192,7 +192,7 @@ export default function Footer({ fullWidth = false }: FooterProps) {
 
           {/* Links section */}
           <div>
-            <h2 className='mb-[16px] font-medium text-[14px] text-foreground'>More Sim</h2>
+            <h2 className='mb-[16px] font-medium text-[14px] text-foreground'>More Nuggets</h2>
             <div className='flex flex-col gap-[12px]'>
               <Link
                 href='https://docs.sim.ai'
@@ -220,7 +220,7 @@ export default function Footer({ fullWidth = false }: FooterProps) {
                 href='/studio'
                 className='text-[14px] text-muted-foreground transition-colors hover:text-foreground'
               >
-                Sim Studio
+                Nuggets Studio
               </Link>
               <Link
                 href='/changelog'

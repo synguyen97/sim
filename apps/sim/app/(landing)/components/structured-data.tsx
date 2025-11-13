@@ -5,8 +5,8 @@ export default function StructuredData() {
       {
         '@type': 'Organization',
         '@id': 'https://sim.ai/#organization',
-        name: 'Sim',
-        alternateName: 'Sim Studio',
+        name: 'Nuggets',
+        alternateName: 'Nuggets Studio',
         description:
           'Open-source AI agent workflow builder used by developers at trail-blazing startups to Fortune 500 companies',
         url: 'https://sim.ai',
@@ -17,7 +17,7 @@ export default function StructuredData() {
           contentUrl: 'https://sim.ai/logo/b&w/text/b&w.svg',
           width: 49.78314,
           height: 24.276,
-          caption: 'Sim Logo',
+          caption: 'Nuggets Logo',
         },
         image: { '@id': 'https://sim.ai/#logo' },
         sameAs: [
@@ -36,7 +36,7 @@ export default function StructuredData() {
         '@type': 'WebSite',
         '@id': 'https://sim.ai/#website',
         url: 'https://sim.ai',
-        name: 'Sim - AI Agent Workflow Builder',
+        name: 'Nuggets - AI Agent Workflow Builder',
         description:
           'Open-source AI agent workflow builder. 50,000+ developers build and deploy agentic workflows. SOC2 and HIPAA compliant.',
         publisher: {
@@ -59,7 +59,7 @@ export default function StructuredData() {
         '@type': 'WebPage',
         '@id': 'https://sim.ai/#webpage',
         url: 'https://sim.ai',
-        name: 'Sim - Workflows for LLMs | Build AI Agent Workflows',
+        name: 'Nuggets - Workflows for LLMs | Build AI Agent Workflows',
         isPartOf: {
           '@id': 'https://sim.ai/#website',
         },
@@ -69,7 +69,7 @@ export default function StructuredData() {
         datePublished: '2024-01-01T00:00:00+00:00',
         dateModified: new Date().toISOString(),
         description:
-          'Build and deploy AI agent workflows with Sim. Visual drag-and-drop interface for creating powerful LLM-powered automations.',
+          'Build and deploy AI agent workflows with Nuggets. Visual drag-and-drop interface for creating powerful LLM-powered automations.',
         breadcrumb: {
           '@id': 'https://sim.ai/#breadcrumb',
         },
@@ -96,7 +96,7 @@ export default function StructuredData() {
       {
         '@type': 'SoftwareApplication',
         '@id': 'https://sim.ai/#software',
-        name: 'Sim - AI Agent Workflow Builder',
+        name: 'Nuggets - AI Agent Workflow Builder',
         description:
           'Open-source AI agent workflow builder used by 50,000+ developers. Build agentic workflows with visual drag-and-drop interface. SOC2 and HIPAA compliant. Integrate with 100+ apps.',
         applicationCategory: 'DeveloperApplication',
@@ -185,7 +185,7 @@ export default function StructuredData() {
           {
             '@type': 'ImageObject',
             url: 'https://sim.ai/screenshots/workflow-builder.png',
-            caption: 'Sim workflow builder interface',
+            caption: 'Nuggets workflow builder interface',
           },
         ],
       },
@@ -195,26 +195,26 @@ export default function StructuredData() {
         mainEntity: [
           {
             '@type': 'Question',
-            name: 'What is Sim?',
+            name: 'What is Nuggets?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Sim is an open-source AI agent workflow builder used by 50,000+ developers at trail-blazing startups to Fortune 500 companies. It provides a visual drag-and-drop interface for building and deploying agentic workflows. Sim is SOC2 and HIPAA compliant.',
+              text: 'Nuggets is an open-source AI agent workflow builder used by 50,000+ developers at trail-blazing startups to Fortune 500 companies. It provides a visual drag-and-drop interface for building and deploying agentic workflows. Nuggets is SOC2 and HIPAA compliant.',
             },
           },
           {
             '@type': 'Question',
-            name: 'Which AI models does Sim support?',
+            name: 'Which AI models does Nuggets support?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Sim supports all major AI models including OpenAI (GPT-5, GPT-4o), Anthropic (Claude), Google (Gemini), xAI (Grok), Mistral, Perplexity, and many more. You can also connect to open-source models via Ollama.',
+              text: 'Nuggets supports all major AI models including OpenAI (GPT-5, GPT-4o), Anthropic (Claude), Google (Gemini), xAI (Grok), Mistral, Perplexity, and many more. You can also connect to open-source models via Ollama.',
             },
           },
           {
             '@type': 'Question',
-            name: 'Do I need coding skills to use Sim?',
+            name: 'Do I need coding skills to use Nuggets?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'No coding skills are required! Sim features a visual drag-and-drop interface that makes it easy to build AI workflows. However, developers can also use custom functions and our API for advanced use cases.',
+              text: 'No coding skills are required! Nuggets features a visual drag-and-drop interface that makes it easy to build AI workflows. However, developers can also use custom functions and our API for advanced use cases.',
             },
           },
         ],
@@ -229,7 +229,7 @@ export default function StructuredData() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       {/* LLM-friendly semantic HTML comments */}
-      {/* About: Sim is a visual workflow builder for AI agents and large language models (LLMs) */}
+      {/* About: Nuggets is a visual workflow builder for AI agents and large language models (LLMs) */}
       {/* Purpose: Enable users to create AI-powered automations without coding */}
       {/* Features: Drag-and-drop interface, 100+ integrations, multi-model support */}
       {/* Use cases: Email automation, chatbots, data analysis, content generation */}

@@ -247,7 +247,7 @@ export default function TermsOfService() {
       <section>
         <h2 className='mb-4 font-semibold text-2xl'>13. Indemnification</h2>
         <p>
-          You agree to indemnify, defend, and hold harmless Sim, Inc and its officers, directors,
+          You agree to indemnify, defend, and hold harmless Nuggets, Inc and its officers, directors,
           employees, and agents from any claims, damages, losses, liabilities, and expenses
           (including reasonable attorneys' fees) arising from your use of the Service, your
           violation of these Terms, or your violation of any rights of another party.

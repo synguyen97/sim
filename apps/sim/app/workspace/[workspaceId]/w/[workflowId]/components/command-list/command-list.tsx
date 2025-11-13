@@ -60,7 +60,7 @@ export function CommandList() {
         <div className='mb-[20px] flex justify-center'>
           <Image
             src='/logo/b&w/text/b&w.svg'
-            alt='Sim'
+            alt='Nuggets'
             width={99.56}
             height={48.56}
             className='opacity-70'

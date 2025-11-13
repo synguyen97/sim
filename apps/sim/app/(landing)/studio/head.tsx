@@ -5,7 +5,7 @@ export default function Head() {
       <link
         rel='alternate'
         type='application/rss+xml'
-        title='Sim Studio'
+        title='Nuggets Studio'
         href='https://sim.ai/studio/rss.xml'
       />
     </>

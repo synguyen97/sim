@@ -49,7 +49,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <header className='mx-auto max-w-[1450px] px-6 pt-8 sm:px-8 sm:pt-12 md:px-12 md:pt-16'>
         <div className='mb-6'>
           <Link href='/studio' className='text-gray-600 text-sm hover:text-gray-900'>
-            ← Back to Sim Studio
+            ← Back to Nuggets Studio
           </Link>
         </div>
         <div className='flex flex-col gap-8 md:flex-row md:gap-12'>
@@ -158,7 +158,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </div>
         </div>
       )}
-      <meta itemProp='publisher' content='Sim' />
+      <meta itemProp='publisher' content='Nuggets' />
       <meta itemProp='inLanguage' content='en-US' />
       <meta itemProp='keywords' content={post.tags.join(', ')} />
     </article>

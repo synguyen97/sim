@@ -68,7 +68,7 @@ export default function InviteError() {
       <div className='mb-8'>
         <Image
           src={brandConfig.logoUrl || '/logo/b&w/medium.png'}
-          alt='Sim Logo'
+          alt='Nuggets Logo'
           width={120}
           height={67}
           className='dark:invert'
